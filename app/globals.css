@@ -19,3 +19,367 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 编辑器样式优化 */
+.w-md-editor {
+  box-shadow: none !important;
+  border-radius: 0.5rem !important;
+}
+
+.w-md-editor-toolbar {
+  border-bottom: 1px solid #e5e7eb !important;
+  background: #fff !important;
+  border-top-left-radius: 0.5rem !important;
+  border-top-right-radius: 0.5rem !important;
+  padding: 0 8px !important;
+}
+
+.w-md-editor-toolbar ul {
+  padding: 4px 0 !important;
+}
+
+.w-md-editor-toolbar li {
+  margin-right: 4px !important;
+}
+
+.w-md-editor-toolbar li:last-child {
+  margin-right: 0 !important;
+}
+
+.w-md-editor-toolbar li > button {
+  color: #4b5563 !important;
+  padding: 4px !important;
+  border-radius: 4px !important;
+  margin: 0 !important;
+  font-size: 16px !important;
+}
+
+.w-md-editor-toolbar li > button:hover {
+  background: #f3f4f6 !important;
+  color: #1f2937 !important;
+}
+
+.w-md-editor-toolbar li > button.active {
+  background: #f3f4f6 !important;
+  color: #2563eb !important;
+}
+
+.w-md-editor-toolbar-divider {
+  height: 20px !important;
+  margin: 0 4px !important;
+  background-color: #e5e7eb !important;
+}
+
+.w-md-editor-text {
+  padding: 16px !important;
+}
+
+.w-md-editor-text-pre > code,
+.w-md-editor-text-input {
+  font-size: 14px !important;
+  line-height: 1.75 !important;
+  padding: 0 !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+}
+
+.w-md-editor-text-input::placeholder {
+  color: #9ca3af !important;
+}
+
+/* 功能按钮样式 */
+button[title^="复制"], button[title^="切换"] {
+  opacity: 0.9;
+  transform-origin: center;
+  backdrop-filter: blur(8px);
+}
+
+button[title^="复制"]:hover, button[title^="切换"]:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+button[title^="复制"]:active, button[title^="切换"]:active {
+  transform: scale(0.95);
+}
+
+button[title="复制成功！"] {
+  background-color: #22c55e !important;
+}
+
+/* 手机预览模式样式 */
+.mobile-preview {
+  width: 375px;
+  min-height: 667px;
+  max-height: 80vh;
+  background: white;
+  border-radius: 40px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 0 0 10px #1a1a1a,
+    0 0 5px 10px rgba(0, 0, 0, 0.1),
+    0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-notch {
+  position: relative;
+  width: 100%;
+  height: 28px;
+  background: #1a1a1a;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.phone-speaker {
+  width: 40px;
+  height: 4px;
+  background: #333;
+  border-radius: 2px;
+}
+
+.phone-camera {
+  width: 4px;
+  height: 4px;
+  background: #333;
+  border-radius: 50%;
+}
+
+.phone-screen {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 自定义滚动条样式 */
+.phone-screen::-webkit-scrollbar {
+  width: 4px;
+}
+
+.phone-screen::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.phone-screen::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 2px;
+}
+
+.phone-screen::-webkit-scrollbar-thumb:hover {
+  background: #bbb;
+}
+
+/* 手机预览模式下的内容样式 */
+.mobile-preview .markdown-preview {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.mobile-preview .markdown-preview h1 {
+  font-size: 20px;
+  margin: 1.5em 0 1em;
+}
+
+.mobile-preview .markdown-preview h2 {
+  font-size: 18px;
+  margin: 1.4em 0 0.8em;
+}
+
+.mobile-preview .markdown-preview h3 {
+  font-size: 16px;
+  margin: 1.3em 0 0.7em;
+}
+
+.mobile-preview .markdown-preview p {
+  font-size: 14px;
+  margin: 0.8em 0;
+}
+
+.mobile-preview .markdown-preview img {
+  border-radius: 4px;
+  margin: 0.8em auto;
+}
+
+.mobile-preview .markdown-preview table {
+  font-size: 12px;
+}
+
+.mobile-preview .markdown-preview pre {
+  font-size: 12px;
+  padding: 0.8em;
+  margin: 0.8em 0;
+}
+
+/* 预览区域样式 */
+.markdown-preview {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  color: #333;
+  line-height: 1.75;
+  font-size: 16px;
+}
+
+.markdown-preview h1 {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 2em 0 1em;
+  text-align: center;
+  color: #222;
+}
+
+.markdown-preview h2 {
+  font-size: 22px;
+  font-weight: bold;
+  margin: 1.8em 0 1em;
+  padding-bottom: 0.5em;
+  border-bottom: 1px solid #eee;
+  color: #222;
+}
+
+.markdown-preview h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 1.6em 0 0.8em;
+  color: #222;
+}
+
+.markdown-preview h4 {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 1.4em 0 0.6em;
+  color: #222;
+}
+
+.markdown-preview p {
+  margin: 1em 0;
+  letter-spacing: 0.1px;
+  line-height: 1.8;
+}
+
+.markdown-preview img {
+  max-width: 100%;
+  margin: 1em auto;
+  display: block;
+  height: auto;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.markdown-preview blockquote {
+  padding: 1em 1.2em;
+  color: #666;
+  background: #f8f8f8;
+  border-left: 4px solid #ddd;
+  margin: 1em 0;
+  border-radius: 0 4px 4px 0;
+}
+
+.markdown-preview blockquote p {
+  margin: 0;
+}
+
+.markdown-preview ul, .markdown-preview ol {
+  margin: 1em 0;
+  padding-left: 1.2em;
+}
+
+.markdown-preview ul li, .markdown-preview ol li {
+  margin: 0.5em 0;
+  line-height: 1.7;
+}
+
+.markdown-preview ul li::marker {
+  color: #666;
+}
+
+.markdown-preview ol li::marker {
+  color: #666;
+  font-weight: 500;
+}
+
+.markdown-preview code {
+  background: #f5f5f5;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 0.9em;
+  color: #476582;
+}
+
+.markdown-preview pre {
+  background: #282c34;
+  color: #abb2bf;
+  padding: 1em 1.2em;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 1em 0;
+  font-size: 0.95em;
+  line-height: 1.6;
+}
+
+.markdown-preview pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+  font-size: 1em;
+  line-height: inherit;
+  white-space: pre;
+}
+
+.markdown-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: 0.95em;
+  line-height: 1.5;
+}
+
+.markdown-preview table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  text-align: left;
+  color: #333;
+}
+
+.markdown-preview table th,
+.markdown-preview table td {
+  padding: 0.75em 1em;
+  border: 1px solid #e9ecef;
+  vertical-align: middle;
+}
+
+.markdown-preview table tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.markdown-preview table tr:hover {
+  background-color: #f2f2f2;
+}
+
+.markdown-preview table img {
+  margin: 0;
+  display: inline-block;
+  vertical-align: middle;
+  max-height: 300px;
+  width: auto;
+  border-radius: 4px;
+}
+
+.markdown-preview table td:has(img) {
+  text-align: center;
+}
+
+.markdown-preview hr {
+  height: 1px;
+  background-color: #eee;
+  border: none;
+  margin: 2em 0;
+}

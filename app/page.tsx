@@ -1,101 +1,385 @@
-import Image from "next/image";
+'use client';
+
+import React, { useEffect, useState, useRef } from 'react';
+import dynamic from 'next/dynamic';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import rehypeSanitize from 'rehype-sanitize';
+import remarkGfm from 'remark-gfm';
+import TurndownService from 'turndown';
+import { FiCopy, FiCheck, FiSmartphone, FiMonitor } from 'react-icons/fi';
+import '@uiw/react-md-editor/markdown-editor.css';
+import '@uiw/react-markdown-preview/markdown.css';
+
+const MDEditor = dynamic(
+  () => import('@uiw/react-md-editor').then((mod) => {
+    // 自定义工具栏
+    const toolbar = [
+      ['title', 'bold', 'italic', 'quote'],
+      ['link', 'image', 'code'],
+      ['ordered-list', 'unordered-list'],
+      ['table'],
+    ];
+    mod.default.Toolbar = toolbar;
+    return mod.default;
+  }),
+  { ssr: false }
+);
+
+const turndownService = new TurndownService({
+  headingStyle: 'atx',
+  codeBlockStyle: 'fenced',
+  emDelimiter: '*',
+});
+
+// 获取单元格对齐方式的辅助函数
+function getCellAlignment(cell: HTMLElement): string {
+  const style = cell.getAttribute('style') || '';
+  const className = cell.getAttribute('class') || '';
+  
+  // 优先检查 style 属性中的对齐方式
+  if (style.includes('text-align: center') || className.includes('align-center')) {
+    return ':---:';
+  }
+  if (style.includes('text-align: right') || className.includes('align-right')) {
+    return '---:';
+  }
+  if (style.includes('text-align: left') || className.includes('align-left')) {
+    return ':---';
+  }
+  return '---'; // 默认左对齐
+}
+
+// 处理图片的辅助函数
+function processImage(img: HTMLImageElement): string {
+  let src = img.getAttribute('src') || '';
+  const alt = img.alt || '';
+  const originSrc = img.getAttribute('data-origin-src');
+  const tokenSrc = img.getAttribute('data-token-src');
+  
+  // 获取图片尺寸
+  const width = img.getAttribute('width') || img.style.width || '';
+  const height = img.getAttribute('height') || img.style.height || '';
+  const style = img.getAttribute('style') || '';
+  
+  // 从 style 中提取宽高（如果存在）
+  const widthMatch = style.match(/width:\s*(\d+)px/);
+  const heightMatch = style.match(/height:\s*(\d+)px/);
+  const styleWidth = widthMatch ? widthMatch[1] : '';
+  const styleHeight = heightMatch ? heightMatch[1] : '';
+  
+  // 优先使用飞书的原始图片链接
+  if (originSrc) {
+    src = originSrc;
+  } else if (tokenSrc) {
+    src = tokenSrc;
+  }
+  
+  // 如果是 base64 图片，直接使用
+  if (src.startsWith('data:image')) {
+    return `![${alt}](${src})`;
+  }
+  
+  // 处理飞书域名的图片
+  if (src.includes('feishu.cn') || src.includes('larksuite.com')) {
+    // 确保使用 https
+    if (!src.startsWith('http')) {
+      src = 'https:' + src;
+    }
+  }
+  
+  // 构建 HTML 格式的图片标签以保持尺寸
+  const actualWidth = width || styleWidth;
+  const actualHeight = height || styleHeight;
+  
+  if (actualWidth || actualHeight) {
+    const sizeStyle = [];
+    if (actualWidth) sizeStyle.push(`width: ${actualWidth}px`);
+    if (actualHeight) sizeStyle.push(`height: ${actualHeight}px`);
+    return `<img src="${src}" alt="${alt}" style="${sizeStyle.join('; ')}" />`;
+  }
+  
+  return `![${alt}](${src})`;
+}
+
+// 处理单元格内容的辅助函数
+function processCellContent(cell: HTMLElement): string {
+  // 处理图片
+  const img = cell.querySelector('img');
+  if (img) {
+    return processImage(img);
+  }
+
+  // 处理加粗
+  const boldText = Array.from(cell.querySelectorAll('strong, b')).map(b => b.textContent).join(' ');
+  if (boldText) {
+    return `**${boldText}**`;
+  }
+
+  // 处理普通文本
+  const text = cell.textContent?.trim() || '';
+  return text.replace(/\|/g, '\\|'); // 转义表格中的竖线
+}
+
+// 配置图片转换规则
+turndownService.addRule('image', {
+  filter: 'img',
+  replacement: function(content, node) {
+    const img = node as HTMLImageElement;
+    return processImage(img);
+  }
+});
+
+// 配置飞书特殊的代码块规则
+turndownService.addRule('codeBlock', {
+  filter: function(node: HTMLElement): boolean {
+    if (node.nodeName !== 'PRE') return false;
+    const code = node.firstChild as HTMLElement | null;
+    return !!(code && code.nodeName === 'CODE');
+  },
+  replacement: function(content: string, node: Node) {
+    const code = node.firstChild as HTMLElement;
+    const className = code?.getAttribute('class') || '';
+    const lang = className.replace('language-', '') || '';
+    const text = code?.textContent || '';
+    return '\n```' + lang + '\n' + text + '\n```\n';
+  }
+});
+
+// 配置表格转换规则
+turndownService.addRule('table', {
+  filter: 'table',
+  replacement: function(content: string, node: Node) {
+    const table = node as HTMLTableElement;
+    let markdown = '\n';
+    
+    // 处理表头
+    const headerRow = table.querySelector('tr');
+    if (headerRow) {
+      const headers = Array.from(headerRow.querySelectorAll('th,td')).map(cell => {
+        return processCellContent(cell as HTMLElement);
+      });
+      
+      // 获取每列的对齐方式
+      const alignments = Array.from(headerRow.querySelectorAll('th,td')).map(cell => {
+        return getCellAlignment(cell as HTMLElement);
+      });
+
+      markdown += '| ' + headers.join(' | ') + ' |\n';
+      markdown += '| ' + alignments.join(' | ') + ' |\n';
+    }
+
+    // 处理表格内容
+    const rows = Array.from(table.querySelectorAll('tr')).slice(1);
+    rows.forEach(row => {
+      const cells = Array.from(row.querySelectorAll('td')).map(cell => {
+        return processCellContent(cell as HTMLElement);
+      });
+      markdown += '| ' + cells.join(' | ') + ' |\n';
+    });
+
+    return markdown + '\n';
+  }
+});
+
+const defaultContent = `# 欢迎使用公众号排版工具
+
+开始编写你的文章吧！
+
+## 使用说明
+
+1. 左侧编辑区域支持完整的 Markdown 语法
+2. 右侧实时预览排版效果
+3. 支持从飞书文档直接粘贴内容
+4. 可以切换手机预览模式
+5. 一键复制到公众号`;
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [markdown, setMarkdown] = useState(defaultContent);
+  const [mounted, setMounted] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+  const [isMobilePreview, setIsMobilePreview] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const previewWrapperRef = useRef<HTMLDivElement>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    setMounted(true);
+    document.documentElement.setAttribute('data-color-mode', 'light');
+  }, []);
+
+  useEffect(() => {
+    if (previewWrapperRef.current) {
+      previewWrapperRef.current.scrollTop = 0;
+    }
+  }, [isMobilePreview]);
+
+  const handleCopyToWeixin = async () => {
+    if (!previewRef.current) return;
+    
+    try {
+      const tempDiv = document.createElement('div');
+      tempDiv.contentEditable = 'true';
+      tempDiv.style.position = 'fixed';
+      tempDiv.style.left = '-9999px';
+      document.body.appendChild(tempDiv);
+      
+      const content = previewRef.current.cloneNode(true) as HTMLElement;
+      const buttonsToRemove = content.querySelectorAll('button');
+      buttonsToRemove.forEach(button => button.remove());
+      
+      const images = content.querySelectorAll('img');
+      images.forEach(img => {
+        if (img.src.startsWith('/')) {
+          img.src = window.location.origin + img.src;
+        }
+      });
+      
+      tempDiv.appendChild(content);
+      
+      const range = document.createRange();
+      range.selectNodeContents(tempDiv);
+      const selection = window.getSelection();
+      if (selection) {
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+      
+      document.execCommand('copy');
+      
+      document.body.removeChild(tempDiv);
+      if (selection) {
+        selection.removeAllRanges();
+      }
+      
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('复制失败:', err);
+      alert('复制失败，请重试');
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const html = e.clipboardData.getData('text/html');
+    if (html) {
+      e.preventDefault();
+      const markdownContent = turndownService.turndown(html);
+      setMarkdown(markdownContent);
+    }
+  };
+
+  if (!mounted) {
+    return (
+      <div className="flex h-screen bg-gray-100">
+        <div className="w-1/2 p-4 bg-white shadow-lg">
+          <div className="h-full bg-gray-100 animate-pulse" />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+        <div className="w-1/2 p-4">
+          <div className="max-w-[780px] mx-auto bg-white p-8 shadow-lg">
+            <div className="h-full bg-gray-100 animate-pulse" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen bg-gray-100 overflow-hidden">
+      {/* 左侧编辑器 */}
+      <div className="w-1/2 p-4">
+        <div className="h-full bg-white rounded-lg shadow-lg overflow-hidden" data-color-mode="light">
+          <MDEditor
+            value={markdown}
+            onChange={(value) => setMarkdown(value || '')}
+            height="100%"
+            preview="edit"
+            hideToolbar={false}
+            visibleDragbar={false}
+            enableScroll={true}
+            toolbarHeight={40}
+            previewOptions={{
+              style: {
+                display: 'none'
+              }
+            }}
+            textareaProps={{
+              placeholder: '在这里输入 Markdown 内容...',
+              style: {
+                background: 'white',
+                fontSize: '14px',
+                lineHeight: '1.75',
+                padding: '16px',
+              },
+              onPaste: handlePaste,
+            }}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </div>
+      </div>
+
+      {/* 右侧预览 */}
+      <div ref={previewWrapperRef} className="w-1/2 p-4 overflow-auto bg-gray-100 relative">
+        <div className={`transition-all duration-300 ${
+          isMobilePreview 
+            ? 'mobile-preview mx-auto my-8'
+            : 'max-w-[780px] mx-auto bg-white rounded-lg p-8 shadow-lg'
+        }`}>
+          {isMobilePreview && (
+            <>
+              <div className="phone-notch">
+                <div className="phone-speaker"></div>
+                <div className="phone-camera"></div>
+              </div>
+              <div className="phone-screen">
+                <div ref={previewRef} className="prose prose-sm max-w-none markdown-preview">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeRaw, rehypeSanitize]}
+                  >
+                    {markdown}
+                  </ReactMarkdown>
+                </div>
+              </div>
+            </>
+          )}
+          
+          {!isMobilePreview && (
+            <div ref={previewRef} className="prose prose-sm max-w-none markdown-preview">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeRaw, rehypeSanitize]}
+              >
+                {markdown}
+              </ReactMarkdown>
+            </div>
+          )}
+        </div>
+
+        {/* 功能按钮组 */}
+        <div className="fixed bottom-8 right-8 flex flex-col gap-4">
+          <button
+            onClick={() => setIsMobilePreview(!isMobilePreview)}
+            title={isMobilePreview ? '切换到电脑预览' : '切换到手机预览'}
+            className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-500 hover:bg-purple-600 text-white shadow-lg transition-all duration-200 hover:scale-110"
+          >
+            {isMobilePreview ? (
+              <FiMonitor className="w-6 h-6" />
+            ) : (
+              <FiSmartphone className="w-6 h-6" />
+            )}
+          </button>
+          <button
+            onClick={handleCopyToWeixin}
+            title={copySuccess ? '复制成功！' : '复制到公众号'}
+            className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-lg transition-all duration-200 hover:scale-110"
+          >
+            {copySuccess ? (
+              <FiCheck className="w-6 h-6" />
+            ) : (
+              <FiCopy className="w-6 h-6" />
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
