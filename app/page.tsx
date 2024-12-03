@@ -197,7 +197,7 @@ export default function Home() {
   const [markdown, setMarkdown] = useState(defaultContent);
   const [mounted, setMounted] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
-  const [isMobilePreview, setIsMobilePreview] = useState(false);
+  const [isMobilePreview, setIsMobilePreview] = useState(true);
   const previewRef = useRef<HTMLDivElement>(null);
   const previewWrapperRef = useRef<HTMLDivElement>(null);
 
