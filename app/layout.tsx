@@ -1,4 +1,6 @@
+import React from 'react';
 import type { Metadata } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
   title: '飞书文档转公众号 | 在线排版工具',
@@ -16,15 +18,17 @@ export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}): React.JSX.Element {
   return (
-    <html lang="zh">
+    <html lang="zh" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://lark-to-markdown.vercel.app" />
       </head>
-      <body>{children}</body>
+      <body className="min-h-screen bg-gray-50 text-gray-900 antialiased">
+        {children}
+      </body>
     </html>
   );
 }
