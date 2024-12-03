@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 飞书文档转公众号排版工具
 
-## Getting Started
+一个专业的在线工具，帮助你快速将飞书文档转换为美观的微信公众号文章。
 
-First, run the development server:
+## 特性
+
+- ✨ 一键转换：从飞书文档直接复制，自动转换为 Markdown
+- 📱 实时预览：支持手机和电脑两种预览模式
+- 🎨 完整样式：完美支持图片、表格、代码块等格式
+- 🚀 一键复制：轻松粘贴到公众号后台
+
+## 本地开发
 
 ```bash
+# 安装依赖
+npm install
+
+# 启动开发服务器
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# 构建生产版本
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 技术栈
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Next.js 13+
+- React 18+
+- TailwindCSS
+- React Markdown
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 部署
 
-## Learn More
+本项目已配置好自动部署到 Vercel，只需要：
 
-To learn more about Next.js, take a look at the following resources:
+1. Fork 本项目
+2. 在 Vercel 中导入项目
+3. 自动部署完成
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 开源协议
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
