@@ -172,25 +172,30 @@ turndownService.addRule('table', {
   }
 });
 
-const defaultContent = `# 欢迎使用公众号排版工具
+const defaultContent = `# 飞书文档转公众号排版工具
 
-开始编写你的文章吧！
+快速将飞书文档转换为精美的公众号文章！
 
-## 使用说明
+## 核心功能
 
-1. 左侧是 Markdown 编辑区
-2. 右侧是预览区，展示最终效果
-3. 支持从飞书文档直接粘贴内容
+1. ✨ 一键转换：从飞书文档直接复制，自动转换为 Markdown
+2. 📱 实时预览：支持手机和电脑两种预览模式
+3. 🎨 完整样式：完美支持图片、表格、代码块等格式
+4. 🚀 一键复制：轻松粘贴到公众号后台
 
-## 支持格式
+## 使用方法
 
-- 标题
-- 加粗
-- 列表
-- 引用
-- 代码块
-- 图片（支持飞书文档图片和尺寸）
-- 表格（支持对齐方式和样式）
+1. 打开飞书文档，复制需要转换的内容
+2. 粘贴到左侧编辑区
+3. 右侧实时预览效果
+4. 点击复制按钮，粘贴到公众号
+
+## 特色功能
+
+- ✅ 保持图片尺寸和样式
+- ✅ 保持表格对齐方式
+- ✅ 支持代码高亮
+- ✅ 支持 Markdown 语法
 `;
 
 export default function Home() {
@@ -295,6 +300,17 @@ export default function Home() {
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* 左侧编辑器 */}
       <div className="w-1/2 p-4 bg-white shadow-lg flex flex-col">
+        <h1 className="mb-4 px-4 py-2 flex items-center gap-2 text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 text-transparent bg-clip-text">
+          <svg className="w-6 h-6 text-purple-600" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M14 2V8H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M16 13H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M16 17H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M10 9H9H8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          飞书文档转公众号
+          <span className="text-sm font-normal text-gray-500">排版工具</span>
+        </h1>
         <div className="flex-1 overflow-hidden" data-color-mode="light">
           <MDEditor
             value={markdown}
