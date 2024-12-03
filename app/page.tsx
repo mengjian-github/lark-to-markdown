@@ -12,17 +12,7 @@ import '@uiw/react-md-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
 
 const MDEditor = dynamic(
-  () => import('@uiw/react-md-editor').then((mod) => {
-    // 自定义工具栏
-    const toolbar = [
-      ['title', 'bold', 'italic', 'quote'],
-      ['link', 'image', 'code'],
-      ['ordered-list', 'unordered-list'],
-      ['table'],
-    ];
-    mod.default.Toolbar = toolbar;
-    return mod.default;
-  }),
+  () => import('@uiw/react-md-editor').then((mod) => mod.default),
   { ssr: false }
 );
 
@@ -188,11 +178,20 @@ const defaultContent = `# 欢迎使用公众号排版工具
 
 ## 使用说明
 
-1. 左侧编辑区域支持完整的 Markdown 语法
-2. 右侧实时预览排版效果
+1. 左侧是 Markdown 编辑区
+2. 右侧是预览区，展示最终效果
 3. 支持从飞书文档直接粘贴内容
-4. 可以切换手机预览模式
-5. 一键复制到公众号`;
+
+## 支持格式
+
+- 标题
+- 加粗
+- 列表
+- 引用
+- 代码块
+- 图片（支持飞书文档图片和尺寸）
+- 表格（支持对齐方式和样式）
+`;
 
 export default function Home() {
   const [markdown, setMarkdown] = useState(defaultContent);
@@ -217,16 +216,21 @@ export default function Home() {
     if (!previewRef.current) return;
     
     try {
+      // 创建一个临时的可编辑 div
       const tempDiv = document.createElement('div');
       tempDiv.contentEditable = 'true';
       tempDiv.style.position = 'fixed';
       tempDiv.style.left = '-9999px';
       document.body.appendChild(tempDiv);
       
+      // 复制预览区域的内容到临时 div
       const content = previewRef.current.cloneNode(true) as HTMLElement;
+      
+      // 移除不需要的元素
       const buttonsToRemove = content.querySelectorAll('button');
       buttonsToRemove.forEach(button => button.remove());
       
+      // 确保图片使用绝对路径
       const images = content.querySelectorAll('img');
       images.forEach(img => {
         if (img.src.startsWith('/')) {
@@ -236,6 +240,7 @@ export default function Home() {
       
       tempDiv.appendChild(content);
       
+      // 选中内容
       const range = document.createRange();
       range.selectNodeContents(tempDiv);
       const selection = window.getSelection();
@@ -244,13 +249,16 @@ export default function Home() {
         selection.addRange(range);
       }
       
+      // 执行复制命令
       document.execCommand('copy');
       
+      // 清理
       document.body.removeChild(tempDiv);
       if (selection) {
         selection.removeAllRanges();
       }
       
+      // 显示成功提示
       setCopySuccess(true);
       setTimeout(() => setCopySuccess(false), 2000);
     } catch (err) {
@@ -286,8 +294,8 @@ export default function Home() {
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden">
       {/* 左侧编辑器 */}
-      <div className="w-1/2 p-4">
-        <div className="h-full bg-white rounded-lg shadow-lg overflow-hidden" data-color-mode="light">
+      <div className="w-1/2 p-4 bg-white shadow-lg flex flex-col">
+        <div className="flex-1 overflow-hidden" data-color-mode="light">
           <MDEditor
             value={markdown}
             onChange={(value) => setMarkdown(value || '')}
@@ -296,7 +304,7 @@ export default function Home() {
             hideToolbar={false}
             visibleDragbar={false}
             enableScroll={true}
-            toolbarHeight={40}
+            toolbarHeight={48}
             previewOptions={{
               style: {
                 display: 'none'
@@ -306,9 +314,7 @@ export default function Home() {
               placeholder: '在这里输入 Markdown 内容...',
               style: {
                 background: 'white',
-                fontSize: '14px',
-                lineHeight: '1.75',
-                padding: '16px',
+                padding: 0,
               },
               onPaste: handlePaste,
             }}
@@ -317,32 +323,20 @@ export default function Home() {
       </div>
 
       {/* 右侧预览 */}
-      <div ref={previewWrapperRef} className="w-1/2 p-4 overflow-auto bg-gray-100 relative">
+      <div ref={previewWrapperRef} className="w-1/2 p-4 overflow-auto bg-gray-50 relative">
         <div className={`transition-all duration-300 ${
           isMobilePreview 
             ? 'mobile-preview mx-auto my-8'
-            : 'max-w-[780px] mx-auto bg-white rounded-lg p-8 shadow-lg'
+            : 'max-w-[780px] mx-auto bg-white p-8 shadow-lg'
         }`}>
           {isMobilePreview && (
-            <>
-              <div className="phone-notch">
-                <div className="phone-speaker"></div>
-                <div className="phone-camera"></div>
-              </div>
-              <div className="phone-screen">
-                <div ref={previewRef} className="prose prose-sm max-w-none markdown-preview">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeRaw, rehypeSanitize]}
-                  >
-                    {markdown}
-                  </ReactMarkdown>
-                </div>
-              </div>
-            </>
+            <div className="phone-notch">
+              <div className="phone-speaker"></div>
+              <div className="phone-camera"></div>
+            </div>
           )}
           
-          {!isMobilePreview && (
+          <div className={`${isMobilePreview ? 'p-4 overflow-auto' : ''}`}>
             <div ref={previewRef} className="prose prose-sm max-w-none markdown-preview">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
@@ -351,7 +345,7 @@ export default function Home() {
                 {markdown}
               </ReactMarkdown>
             </div>
-          )}
+          </div>
         </div>
 
         {/* 功能按钮组 */}

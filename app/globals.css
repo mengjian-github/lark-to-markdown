@@ -71,14 +71,15 @@ body {
 }
 
 .w-md-editor-text {
-  padding: 16px !important;
+  padding: 0 !important;
 }
 
-.w-md-editor-text-pre > code,
-.w-md-editor-text-input {
+.w-md-editor-text-pre,
+.w-md-editor-text-input,
+.w-md-editor-text-pre > code {
   font-size: 14px !important;
   line-height: 1.75 !important;
-  padding: 0 !important;
+  padding: 16px !important;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
 }
 
