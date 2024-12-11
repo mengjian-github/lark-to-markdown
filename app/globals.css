@@ -50,40 +50,45 @@
 
 /* Markdown 预览样式 */
 .markdown-preview {
-  font-size: 16px;
-  line-height: 1.75;
-  color: #1f2937;
+  font-size: 15px;
+  line-height: 1.8;
+  color: #333333;
+  letter-spacing: 0.01em;
 }
 
 .markdown-preview h1 {
-  font-size: 2em;
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-  font-weight: bold;
+  font-size: 1.8em;
+  margin-top: 1.4em;
+  margin-bottom: 0.8em;
+  font-weight: 600;
+  color: #111111;
 }
 
 .markdown-preview h2 {
-  font-size: 1.5em;
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-  font-weight: bold;
+  font-size: 1.4em;
+  margin-top: 1.4em;
+  margin-bottom: 0.8em;
+  font-weight: 600;
+  color: #111111;
 }
 
 .markdown-preview h3 {
-  font-size: 1.25em;
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-  font-weight: bold;
+  font-size: 1.2em;
+  margin-top: 1.4em;
+  margin-bottom: 0.8em;
+  font-weight: 600;
+  color: #111111;
 }
 
 .markdown-preview p {
-  margin-bottom: 1em;
+  margin-bottom: 1.2em;
 }
 
 .markdown-preview ul,
 .markdown-preview ol {
-  margin-bottom: 1em;
+  margin-bottom: 1.2em;
   padding-left: 2em;
+  color: #333333;
 }
 
 .markdown-preview ul {

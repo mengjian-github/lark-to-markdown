@@ -2,14 +2,11 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import ReactMarkdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
-import rehypeSanitize from 'rehype-sanitize';
-import remarkGfm from 'remark-gfm';
 import TurndownService from 'turndown';
 import { FiCopy, FiCheck, FiSmartphone, FiMonitor } from 'react-icons/fi';
 import '@uiw/react-md-editor/markdown-editor.css';
 import '@uiw/react-markdown-preview/markdown.css';
+import Preview from '../components/Preview';
 
 const MDEditor = dynamic(
   () => import('@uiw/react-md-editor').then((mod) => mod.default),
@@ -201,7 +198,7 @@ const defaultContent = `# 飞书文档转公众号排版工具
 export default function Home() {
   const [markdown, setMarkdown] = useState(defaultContent);
   const [mounted, setMounted] = useState(false);
-  const [copySuccess, setCopySuccess] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [isMobilePreview, setIsMobilePreview] = useState(true);
   const previewRef = useRef<HTMLDivElement>(null);
   const previewWrapperRef = useRef<HTMLDivElement>(null);
@@ -221,21 +218,158 @@ export default function Home() {
     if (!previewRef.current) return;
     
     try {
-      // 创建一个临时的可编辑 div
-      const tempDiv = document.createElement('div');
-      tempDiv.contentEditable = 'true';
-      tempDiv.style.position = 'fixed';
-      tempDiv.style.left = '-9999px';
-      document.body.appendChild(tempDiv);
+      // 创建一个隔离的容器
+      const container = document.createElement('div');
+      container.style.cssText = 'all: initial;'; // 重置所有样式
       
-      // 复制预览区域的内容到临时 div
-      const content = previewRef.current.cloneNode(true) as HTMLElement;
+      // 创建一个 shadow DOM
+      const shadowRoot = container.attachShadow({ mode: 'open' });
       
-      // 移除不需要的元素
-      const buttonsToRemove = content.querySelectorAll('button');
-      buttonsToRemove.forEach(button => button.remove());
+      // 添加基础样式
+      const style = document.createElement('style');
+      style.textContent = `
+        :host {
+          all: initial;
+          display: block;
+        }
+        div {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+          font-size: 16px;
+          line-height: 1.8;
+          color: #333;
+          letter-spacing: 0.05em;
+          text-align: justify;
+        }
+        h1, h2, h3, h4, h5 {
+          font-weight: bold;
+          color: #000;
+          margin: 1.5em 0 1em;
+          line-height: 1.5;
+          letter-spacing: 0.08em;
+        }
+        h1 {
+          font-size: 24px;
+          margin-top: 1em;
+          text-align: center;
+        }
+        h2 {
+          font-size: 20px;
+          border-left: 4px solid #1890ff;
+          padding-left: 12px;
+        }
+        h3 { font-size: 18px; }
+        p {
+          margin: 1.5em 0;
+          line-height: 2;
+        }
+        img {
+          max-width: 100%;
+          height: auto;
+          margin: 2em auto;
+          display: block;
+          border-radius: 4px;
+        }
+        pre {
+          background: #f8f9fa;
+          padding: 1em;
+          margin: 1.5em 0;
+          border-radius: 4px;
+          overflow-x: auto;
+          font-size: 14px;
+          line-height: 1.6;
+          color: #24292e;
+        }
+        code {
+          font-family: Consolas, Monaco, "Courier New", monospace;
+          background: #f0f2f5;
+          padding: 0.2em 0.4em;
+          border-radius: 3px;
+          font-size: 0.9em;
+          color: #e83e8c;
+        }
+        pre code {
+          background: none;
+          padding: 0;
+          color: inherit;
+        }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+          margin: 2em 0;
+          font-size: 15px;
+        }
+        th, td {
+          border: 1px solid #e8e8e8;
+          padding: 0.8em;
+          text-align: left;
+        }
+        th {
+          background: #f7f7f7;
+          font-weight: 600;
+        }
+        tr:nth-child(even) {
+          background: #fafafa;
+        }
+        blockquote {
+          margin: 2em 0;
+          padding: 1em 1.5em;
+          background: #f8f9fa;
+          border-radius: 4px;
+          color: #666;
+          position: relative;
+        }
+        blockquote::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 4px;
+          background: #1890ff;
+          border-radius: 2px;
+        }
+        ul, ol {
+          margin: 1.5em 0;
+          padding-left: 2em;
+        }
+        li {
+          margin: 0.5em 0;
+          line-height: 1.8;
+        }
+        a {
+          color: #1890ff;
+          text-decoration: none;
+          border-bottom: 1px solid #1890ff;
+        }
+        hr {
+          margin: 2em 0;
+          border: none;
+          border-top: 1px solid #e8e8e8;
+        }
+        /* 强调样式 */
+        strong {
+          color: #222;
+          font-weight: 600;
+        }
+        em {
+          font-style: italic;
+          color: #666;
+        }
+      `;
       
-      // 确保图片使用绝对路径
+      // 创建内容容器
+      const content = document.createElement('div');
+      content.innerHTML = previewRef.current.innerHTML;
+      
+      // 清理内容中的样式和类
+      const cleanNode = (node: Element) => {
+        node.removeAttribute('class');
+        node.removeAttribute('style');
+        Array.from(node.children).forEach(child => cleanNode(child));
+      };
+      cleanNode(content);
+      
+      // 处理图片路径
       const images = content.querySelectorAll('img');
       images.forEach(img => {
         if (img.src.startsWith('/')) {
@@ -243,32 +377,32 @@ export default function Home() {
         }
       });
       
-      tempDiv.appendChild(content);
+      // 将样式和内容添加到 shadow DOM
+      shadowRoot.appendChild(style);
+      shadowRoot.appendChild(content);
+      
+      // 将容器添加到文档中
+      document.body.appendChild(container);
       
       // 选中内容
       const range = document.createRange();
-      range.selectNodeContents(tempDiv);
+      range.selectNodeContents(content);
       const selection = window.getSelection();
-      if (selection) {
-        selection.removeAllRanges();
-        selection.addRange(range);
-      }
+      selection?.removeAllRanges();
+      selection?.addRange(range);
       
-      // 执行复制命令
+      // 复制内容
       document.execCommand('copy');
       
       // 清理
-      document.body.removeChild(tempDiv);
-      if (selection) {
-        selection.removeAllRanges();
-      }
+      document.body.removeChild(container);
+      selection?.removeAllRanges();
       
       // 显示成功提示
-      setCopySuccess(true);
-      setTimeout(() => setCopySuccess(false), 2000);
-    } catch (err) {
-      console.error('复制失败:', err);
-      alert('复制失败，请重试');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('复制失败:', error);
     }
   };
 
@@ -353,13 +487,8 @@ export default function Home() {
           )}
           
           <div className={`${isMobilePreview ? 'p-4 overflow-auto' : ''}`}>
-            <div ref={previewRef} className="prose prose-sm max-w-none markdown-preview">
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeRaw, rehypeSanitize]}
-              >
-                {markdown}
-              </ReactMarkdown>
+            <div ref={previewRef} className="flex-1 overflow-auto px-4">
+              <Preview content={markdown} />
             </div>
           </div>
         </div>
@@ -379,10 +508,10 @@ export default function Home() {
           </button>
           <button
             onClick={handleCopyToWeixin}
-            title={copySuccess ? '复制成功！' : '复制到公众号'}
+            title={copied ? '复制成功！' : '复制到公众号'}
             className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-lg transition-all duration-200 hover:scale-110"
           >
-            {copySuccess ? (
+            {copied ? (
               <FiCheck className="w-6 h-6" />
             ) : (
               <FiCopy className="w-6 h-6" />
