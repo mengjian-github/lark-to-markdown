@@ -75,7 +75,7 @@ function processImage(img: HTMLImageElement): string {
     }
   }
   
-  // 构建 HTML 格式的图片标签以保持尺寸
+  // 构建 HTML 格式的图���标签以保持尺寸
   const actualWidth = width || styleWidth;
   const actualHeight = height || styleHeight;
   
@@ -308,7 +308,7 @@ export default function Home() {
           font-weight: 600;
         }
         tr:nth-child(even) {
-          background: #fafafa;
+          background: transparent;
         }
         blockquote {
           margin: 2em 0;
@@ -383,20 +383,25 @@ export default function Home() {
       
       // 将容器添加到文档中
       document.body.appendChild(container);
-      
-      // 选中内容
-      const range = document.createRange();
-      range.selectNodeContents(content);
-      const selection = window.getSelection();
-      selection?.removeAllRanges();
-      selection?.addRange(range);
-      
-      // 复制内容
-      document.execCommand('copy');
+
+      // 构建包含样式的 HTML 字符串
+      const htmlContent = `
+        <style>
+          ${style.textContent}
+        </style>
+        ${content.innerHTML}
+      `;
+
+      // 使用 Clipboard API 复制 HTML 内容
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          'text/html': blob
+        })
+      ]);
       
       // 清理
       document.body.removeChild(container);
-      selection?.removeAllRanges();
       
       // 显示成功提示
       setCopied(true);
