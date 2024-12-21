@@ -215,185 +215,50 @@ export default function Home() {
   }, [isMobilePreview]);
 
   const handleCopyToWeixin = async () => {
-    if (!previewRef.current) return;
-    
     try {
-      // 创建一个隔离的容器
       const container = document.createElement('div');
-      container.style.cssText = 'all: initial;'; // 重置所有样式
-      
-      // 创建一个 shadow DOM
-      const shadowRoot = container.attachShadow({ mode: 'open' });
-      
-      // 添加基础样式
-      const style = document.createElement('style');
-      style.textContent = `
-        :host {
-          all: initial;
-          display: block;
-        }
-        div {
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-          font-size: 16px;
-          line-height: 1.8;
-          color: #333;
-          letter-spacing: 0.05em;
-          text-align: justify;
-        }
-        h1, h2, h3, h4, h5 {
-          font-weight: bold;
-          color: #000;
-          margin: 1.5em 0 1em;
-          line-height: 1.5;
-          letter-spacing: 0.08em;
-        }
-        h1 {
-          font-size: 24px;
-          margin-top: 1em;
-          text-align: center;
-        }
-        h2 {
-          font-size: 20px;
-          border-left: 4px solid #1890ff;
-          padding-left: 12px;
-        }
-        h3 { font-size: 18px; }
-        p {
-          margin: 1.5em 0;
-          line-height: 2;
-        }
-        img {
-          max-width: 100%;
-          height: auto;
-          margin: 2em auto;
-          display: block;
-          border-radius: 4px;
-        }
-        pre {
-          background: #f8f9fa;
-          padding: 1em;
-          margin: 1.5em 0;
-          border-radius: 4px;
-          overflow-x: auto;
-          font-size: 14px;
-          line-height: 1.6;
-          color: #24292e;
-        }
-        code {
-          font-family: Consolas, Monaco, "Courier New", monospace;
-          background: #f0f2f5;
-          padding: 0.2em 0.4em;
-          border-radius: 3px;
-          font-size: 0.9em;
-          color: #e83e8c;
-        }
-        pre code {
-          background: none;
-          padding: 0;
-          color: inherit;
-        }
-        table {
-          border-collapse: collapse;
-          width: 100%;
-          margin: 2em 0;
-          font-size: 15px;
-        }
-        th, td {
-          border: 1px solid #e8e8e8;
-          padding: 0.8em;
-          text-align: left;
-        }
-        th {
-          background: #f7f7f7;
-          font-weight: 600;
-        }
-        tr:nth-child(even) {
-          background: transparent;
-        }
-        blockquote {
-          margin: 2em 0;
-          padding: 1em 1.5em;
-          background: #f8f9fa;
-          border-radius: 4px;
-          color: #666;
-          position: relative;
-        }
-        blockquote::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          width: 4px;
-          background: #1890ff;
-          border-radius: 2px;
-        }
-        ul, ol {
-          margin: 1.5em 0;
-          padding-left: 2em;
-        }
-        li {
-          margin: 0.5em 0;
-          line-height: 1.8;
-        }
-        a {
-          color: #1890ff;
-          text-decoration: none;
-          border-bottom: 1px solid #1890ff;
-        }
-        hr {
-          margin: 2em 0;
-          border: none;
-          border-top: 1px solid #e8e8e8;
-        }
-        /* 强调样式 */
-        strong {
-          color: #222;
-          font-weight: 600;
-        }
-        em {
-          font-style: italic;
-          color: #666;
-        }
-      `;
-      
-      // 创建内容容器
-      const content = document.createElement('div');
-      content.innerHTML = previewRef.current.innerHTML;
-      
-      // 清理内容中的样式和类
-      const cleanNode = (node: Element) => {
-        node.removeAttribute('class');
-        node.removeAttribute('style');
-        Array.from(node.children).forEach(child => cleanNode(child));
-      };
-      cleanNode(content);
-      
-      // 处理图片路径
-      const images = content.querySelectorAll('img');
-      images.forEach(img => {
-        if (img.src.startsWith('/')) {
-          img.src = window.location.origin + img.src;
-        }
-      });
-      
-      // 将样式和内容添加到 shadow DOM
-      shadowRoot.appendChild(style);
-      shadowRoot.appendChild(content);
-      
-      // 将容器添加到文档中
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
       document.body.appendChild(container);
 
-      // 构建包含样式的 HTML 字符串
-      const htmlContent = `
-        <style>
-          ${style.textContent}
-        </style>
-        ${content.innerHTML}
-      `;
+      // 创建一个临时的预览容器
+      const tempPreview = document.createElement('div');
+      
+      // 复制预览区域的内容
+      if (previewRef.current) {
+        const content = previewRef.current.innerHTML;
+        
+        // 转换标题
+        let processedContent = content
+          .replace(/<h1[^>]*>(.*?)<\/h1>/g, '<h2 style="text-align: center; font-size: 24px; font-weight: bold;">$1</h2>')
+          .replace(/<h2[^>]*>(.*?)<\/h2>/g, '<h2 style="font-size: 20px; font-weight: bold; margin: 20px 0px; border-left: 4px solid #1890ff; padding-left: 10px;">$1</h2>')
+          .replace(/<h3[^>]*>(.*?)<\/h3>/g, '<h3 style="font-size: 18px; font-weight: bold;">$1</h3>')
+          // 处理段落
+          .replace(/<p[^>]*>(.*?)<\/p>/g, '<p style="margin: 1em 0; line-height: 2;">$1</p>')
+          // 处理列表
+          .replace(/<ul[^>]*>/g, '<ul style="margin: 1em 0; padding-left: 2em; list-style-type: disc;">')
+          .replace(/<ol[^>]*>/g, '<ol style="margin: 1em 0; padding-left: 2em; list-style-type: decimal;">')
+          .replace(/<li[^>]*>(.*?)<\/li>/g, '<li style="margin: 0.5em 0; line-height: 1.8;">$1</li>')
+          // 处理代码块
+          .replace(/<pre[^>]*>(.*?)<\/pre>/g, '<pre style="background-color: #f6f8fa; padding: 1em; border-radius: 4px; margin: 1em 0; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 14px;">$1</pre>')
+          .replace(/<code[^>]*>(.*?)<\/code>/g, '<code style="background-color: #f6f8fa; padding: 0.2em 0.4em; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 0.9em;">$1</code>')
+          // 处理引用
+          .replace(/<blockquote[^>]*>(.*?)<\/blockquote>/g, '<blockquote style="margin: 1em 0; padding: 1em; background-color: #f6f8fa; border-left: 4px solid #1890ff; color: #666666;">$1</blockquote>')
+          // 处理图片
+          .replace(/<img([^>]*)>/g, (match, attrs) => {
+            // 保留原有属性，添加样式
+            return `<img${attrs} style="max-width: 100%; display: block; margin: 1em auto;" data-type="jpeg" class="rich_pages wxw-img" />`;
+          })
+          // 处理加粗文本
+          .replace(/<strong[^>]*>(.*?)<\/strong>/g, '<strong style="font-weight: bold;">$1</strong>');
 
-      // 使用 Clipboard API 复制 HTML 内容
-      const blob = new Blob([htmlContent], { type: 'text/html' });
+        tempPreview.innerHTML = processedContent;
+      }
+      
+      // 创建包含样式的HTML blob
+      const blob = new Blob([tempPreview.innerHTML], { type: 'text/html' });
+      
+      // 复制到剪贴板
       await navigator.clipboard.write([
         new ClipboardItem({
           'text/html': blob
