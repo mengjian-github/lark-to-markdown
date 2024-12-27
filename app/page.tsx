@@ -3,11 +3,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import TurndownService from 'turndown';
-import { FiCopy, FiCheck, FiSmartphone, FiMonitor } from 'react-icons/fi';
+import { FiCopy, FiCheck, FiSmartphone, FiMonitor, FiSun, FiMoon, FiFeather, FiDroplet } from 'react-icons/fi';
 import '@uiw/react-md-editor/markdown-editor.css';
 import Preview from '../components/Preview';
 import { defaultTheme } from '../themes/default';
 import { applyThemeStyles } from '../utils/themeUtils';
+import { ThemeProvider, useTheme, ThemeName } from '../contexts/ThemeContext';
 
 const MDEditor = dynamic(
   () => import('@uiw/react-md-editor').then((mod) => mod.default),
@@ -215,13 +216,14 @@ const defaultContent = `# 飞书文档转公众号排版工具
 - ✅ 支持 Markdown 语法
 `;
 
-export default function Home() {
+const Home: React.FC = () => {
   const [markdown, setMarkdown] = useState(defaultContent);
   const [mounted, setMounted] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isMobilePreview, setIsMobilePreview] = useState(true);
   const previewRef = useRef<HTMLDivElement>(null);
   const previewWrapperRef = useRef<HTMLDivElement>(null);
+  const { themeName, setTheme, currentTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);
@@ -247,7 +249,7 @@ export default function Home() {
       // 复制预览区域的内容
       if (previewRef.current) {
         const content = previewRef.current.innerHTML;
-        tempPreview.innerHTML = applyThemeStyles(content, defaultTheme);
+        tempPreview.innerHTML = applyThemeStyles(content, currentTheme);
       }
       
       // 创建包含样式的HTML blob
@@ -279,6 +281,13 @@ export default function Home() {
       setMarkdown(markdownContent);
     }
   };
+
+  // 主题切换按钮配置
+  const themeButtons = [
+    { name: 'default', icon: FiSun, title: '默认主题' },
+    { name: 'warm', icon: FiDroplet, title: '暖色主题' },
+    { name: 'minimalist', icon: FiFeather, title: '极简主题' },
+  ];
 
   if (!mounted) {
     return (
@@ -360,6 +369,25 @@ export default function Home() {
 
         {/* 功能按钮组 */}
         <div className="fixed bottom-8 right-8 flex flex-col gap-4">
+          {/* 主题切换按钮组 */}
+          <div className="flex flex-col gap-2">
+            {themeButtons.map(({ name, icon: Icon, title }) => (
+              <button
+                key={name}
+                onClick={() => setTheme(name as ThemeName)}
+                title={title}
+                className={`w-12 h-12 flex items-center justify-center rounded-full 
+                  ${themeName === name 
+                    ? 'bg-purple-500 text-white' 
+                    : 'bg-white text-gray-600 hover:bg-gray-100'
+                  } shadow-lg transition-all duration-200 hover:scale-110`}
+              >
+                <Icon className="w-6 h-6" />
+              </button>
+            ))}
+          </div>
+
+          {/* 预览模式切换按钮 */}
           <button
             onClick={() => setIsMobilePreview(!isMobilePreview)}
             title={isMobilePreview ? '切换到电脑预览' : '切换到手机预览'}
@@ -371,6 +399,8 @@ export default function Home() {
               <FiSmartphone className="w-6 h-6" />
             )}
           </button>
+
+          {/* 复制按钮 */}
           <button
             onClick={handleCopyToWeixin}
             title={copied ? '复制成功！' : '复制到公众号'}
@@ -385,5 +415,14 @@ export default function Home() {
         </div>
       </div>
     </div>
+  );
+};
+
+// 包装组件
+export default function App() {
+  return (
+    <ThemeProvider>
+      <Home />
+    </ThemeProvider>
   );
 }

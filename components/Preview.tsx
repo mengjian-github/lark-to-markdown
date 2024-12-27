@@ -2,8 +2,8 @@ import React, { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import type { Components } from 'react-markdown';
 import Image from 'next/image';
-import { defaultTheme } from '../themes/default';
 import { generateInlineStyles } from '../utils/themeUtils';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface PreviewProps {
   content: string;
@@ -15,7 +15,8 @@ interface ComponentProps {
 }
 
 const Preview: React.FC<PreviewProps> = ({ content }) => {
-  const styles = generateInlineStyles(defaultTheme);
+  const { currentTheme } = useTheme();
+  const styles = generateInlineStyles(currentTheme);
   
   const components: Partial<Components> = {
     h1: ({ children }: ComponentProps) => <h1 style={styles.h1}>{children}</h1>,
