@@ -37,6 +37,30 @@ export function generateInlineStyles(theme: Theme) {
       lineHeight: '1.5',
       letterSpacing: theme.headings.letterSpacing,
     },
+    h4: {
+      fontWeight: theme.headings.fontWeight,
+      color: theme.headings.color,
+      fontSize: theme.headings.h4.fontSize,
+      margin: theme.headings.h4.margin,
+      lineHeight: '1.5',
+      letterSpacing: theme.headings.letterSpacing,
+    },
+    h5: {
+      fontWeight: theme.headings.fontWeight,
+      color: theme.headings.color,
+      fontSize: theme.headings.h5.fontSize,
+      margin: theme.headings.h5.margin,
+      lineHeight: '1.5',
+      letterSpacing: theme.headings.letterSpacing,
+    },
+    h6: {
+      fontWeight: theme.headings.fontWeight,
+      color: theme.headings.h6.color,
+      fontSize: theme.headings.h6.fontSize,
+      margin: theme.headings.h6.margin,
+      lineHeight: '1.5',
+      letterSpacing: theme.headings.letterSpacing,
+    },
     p: {
       margin: theme.paragraph.margin,
       lineHeight: theme.paragraph.lineHeight,
@@ -164,8 +188,24 @@ export function applyThemeStyles(content: string, theme: Theme) {
     .replace(/<h1[^>]*>(.*?)<\/h1>/g, `<h1 style="${styleToString(styles.h1)}">$1</h1>`)
     .replace(/<h2[^>]*>(.*?)<\/h2>/g, `<h2 style="${styleToString(styles.h2)}">$1</h2>`)
     .replace(/<h3[^>]*>(.*?)<\/h3>/g, `<h3 style="${styleToString(styles.h3)}">$1</h3>`)
+    .replace(/<h4[^>]*>(.*?)<\/h4>/g, `<h4 style="${styleToString(styles.h4)}">$1</h4>`)
+    .replace(/<h5[^>]*>(.*?)<\/h5>/g, `<h5 style="${styleToString(styles.h5)}">$1</h5>`)
+    .replace(/<h6[^>]*>(.*?)<\/h6>/g, `<h6 style="${styleToString(styles.h6)}">$1</h6>`)
     .replace(/<p[^>]*>(.*?)<\/p>/g, `<p style="${styleToString(styles.p)}">$1</p>`)
-    .replace(/<img([^>]*)>/g, `<img$1 style="${styleToString(styles.img)}" data-type="jpeg" class="rich_pages wxw-img" />`)
+    .replace(/<img([^>]*)>/g, (match, attrs) => {
+      // 提取原始链接
+      const originSrcMatch = attrs.match(/data-origin-src="([^"]+)"/);
+      const originSrc = originSrcMatch ? originSrcMatch[1] : '';
+      
+      // 提取 alt 文本
+      const altMatch = attrs.match(/alt="([^"]*)"/);
+      const alt = altMatch ? altMatch[1] : '';
+
+      // 使用原始链接
+      const src = originSrc || attrs.match(/src="([^"]+)"/)?.[1] || '';
+      
+      return `<img src="${src}" alt="${alt}" style="${styleToString(styles.img)}" data-type="jpeg" class="rich_pages wxw-img" />`;
+    })
     .replace(/<pre[^>]*>([\s\S]*?)<\/pre>/g, `<pre style="${styleToString(styles.pre)}">$1</pre>`)
     .replace(/<code[^>]*>([\s\S]*?)<\/code>/g, (match, content) => {
       const isInPre = match.includes('class="language-');

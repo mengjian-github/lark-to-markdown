@@ -26,6 +26,19 @@ export interface Theme {
       fontSize: string;
       margin: string;
     };
+    h4: {
+      fontSize: string;
+      margin: string;
+    };
+    h5: {
+      fontSize: string;
+      margin: string;
+    };
+    h6: {
+      fontSize: string;
+      margin: string;
+      color: string;
+    };
   };
   paragraph: {
     margin: string;
@@ -125,86 +138,99 @@ export interface Theme {
 export const defaultTheme: Theme = {
   base: {
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-    fontSize: '16px',
-    lineHeight: '1.8',
-    color: '#333',
-    letterSpacing: '0.05em',
-    textAlign: 'justify',
+    fontSize: '15px',
+    lineHeight: '1.75',
+    color: '#333333',
+    letterSpacing: '0.03em',
+    textAlign: 'left',
   },
   headings: {
-    color: '#000',
-    fontWeight: 'bold',
-    letterSpacing: '0.08em',
+    color: '#222222',
+    fontWeight: '600',
+    letterSpacing: '0.05em',
     h1: {
-      fontSize: '24px',
-      margin: '1em 0',
-      textAlign: 'center',
+      fontSize: '20px',
+      margin: '1.2em 0 0.8em',
+      textAlign: 'left',
     },
     h2: {
-      fontSize: '20px',
-      margin: '1.5em 0 1em',
+      fontSize: '18px',
+      margin: '1.2em 0 0.8em',
       borderLeft: '4px solid #1890ff',
-      paddingLeft: '12px',
+      paddingLeft: '10px',
     },
     h3: {
-      fontSize: '18px',
-      margin: '1.5em 0 1em',
+      fontSize: '16px',
+      margin: '1em 0 0.8em',
+    },
+    h4: {
+      fontSize: '15px',
+      margin: '1em 0 0.8em',
+    },
+    h5: {
+      fontSize: '14px',
+      margin: '1em 0 0.8em',
+    },
+    h6: {
+      fontSize: '14px',
+      margin: '1em 0 0.8em',
+      color: '#666666',
     },
   },
   paragraph: {
-    margin: '1.5em 0',
-    lineHeight: '2',
+    margin: '1em 0',
+    lineHeight: '1.75',
   },
   image: {
     maxWidth: '100%',
-    margin: '2em auto',
+    margin: '1em auto',
     borderRadius: '4px',
   },
   code: {
     fontFamily: 'Consolas, Monaco, "Courier New", monospace',
-    fontSize: '14px',
+    fontSize: '13px',
     lineHeight: '1.6',
     block: {
-      background: '#f8f9fa',
-      padding: '1em',
-      margin: '1.5em 0',
+      background: '#f7f7f7',
+      padding: '12px',
+      margin: '1em 0',
       borderRadius: '4px',
-      color: '#24292e',
+      color: '#333333',
     },
     inline: {
-      background: '#f0f2f5',
-      padding: '0.2em 0.4em',
+      background: '#f7f7f7',
+      padding: '2px 4px',
       borderRadius: '3px',
-      color: '#e83e8c',
+      color: '#d63384',
     },
   },
   table: {
     width: '100%',
-    margin: '2em 0',
-    fontSize: '15px',
-    borderColor: '#e8e8e8',
+    margin: '1em 0',
+    fontSize: '14px',
+    borderColor: '#eaeaea',
     cell: {
-      padding: '0.8em',
+      padding: '8px',
     },
     header: {
-      background: '#f7f7f7',
+      background: '#fafafa',
       fontWeight: '600',
     },
   },
   blockquote: {
-    margin: '2em 0',
-    padding: '1em 1.5em',
-    background: '#f8f9fa',
+    margin: '1em 0',
+    padding: '12px 16px',
+    background: '#fafafa',
     borderRadius: '4px',
-    color: '#666',
+    color: '#666666',
     borderLeft: '4px solid #1890ff',
   },
   list: {
-    margin: '1.5em 0',
-    padding: '0 0 0 2em',
+    margin: '1em 0',
+    padding: '0 0 0 1.5em',
     item: {
-      margin: '0.5em 0',
-      lineHeight: '1.8',
+      margin: '0.3em 0',
+      lineHeight: '1.75',
     },
     unordered: {
       listStyleType: 'disc',
@@ -231,16 +257,16 @@ export const defaultTheme: Theme = {
     borderBottom: '1px solid #1890ff',
   },
   hr: {
-    margin: '2em 0',
-    border: '1px solid #e8e8e8',
+    margin: '1.5em 0',
+    border: '1px solid #eaeaea',
   },
   emphasis: {
     strong: {
-      color: '#222',
+      color: '#222222',
       fontWeight: '600',
     },
     em: {
-      color: '#666',
+      color: '#595959',
       fontStyle: 'italic',
     },
   },

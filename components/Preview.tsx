@@ -21,18 +21,24 @@ const Preview: React.FC<PreviewProps> = ({ content }) => {
     h1: ({ children }: ComponentProps) => <h1 style={styles.h1}>{children}</h1>,
     h2: ({ children }: ComponentProps) => <h2 style={styles.h2}>{children}</h2>,
     h3: ({ children }: ComponentProps) => <h3 style={styles.h3}>{children}</h3>,
+    h4: ({ children }: ComponentProps) => <h4 style={styles.h4}>{children}</h4>,
+    h5: ({ children }: ComponentProps) => <h5 style={styles.h5}>{children}</h5>,
+    h6: ({ children }: ComponentProps) => <h6 style={styles.h6}>{children}</h6>,
     p: ({ children }: ComponentProps) => <p style={styles.p}>{children}</p>,
     img: ({ src, alt, ...props }: ComponentProps) => (
       src ? (
-        <Image
-          src={src}
-          alt={alt || ''}
-          width={800}
-          height={600}
-          style={styles.img}
-          className="rich_pages wxw-img"
-          unoptimized={src.startsWith('data:') || src.includes('feishu.cn') || src.includes('larksuite.com')}
-        />
+        <div style={{ margin: styles.img.margin }}>
+          <Image
+            src={src}
+            alt={alt || ''}
+            width={800}
+            height={600}
+            style={{ ...styles.img, margin: 0 }}
+            className="rich_pages wxw-img"
+            unoptimized={src.startsWith('data:') || src.includes('feishu.cn') || src.includes('larksuite.com')}
+            data-origin-src={src}
+          />
+        </div>
       ) : null
     ),
     pre: ({ children }: ComponentProps) => <pre style={styles.pre}>{children}</pre>,

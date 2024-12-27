@@ -7,6 +7,16 @@ const nextConfig = {
     config.resolve.fallback = { fs: false };
     return config;
   },
+  images: {
+    domains: [
+      'bytedance.larkoffice.com',
+      'bytedance.feishu.cn',
+      'feishu.cn',
+      'sf3-cn.feishucdn.com',
+      'lf3-static.bytednsdoc.com',
+      'p3-hera.byteimg.com',
+    ],
+  },
 }
 
 module.exports = nextConfig 

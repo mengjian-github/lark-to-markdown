@@ -20,6 +20,25 @@ const turndownService = new TurndownService({
   emDelimiter: '*',
 });
 
+// 自定义加粗文本的转换规则
+turndownService.addRule('strong', {
+  filter: ['strong', 'b'],
+  replacement: function (content, node, options) {
+    // 检查前后是否已经有空格
+    const needSpaceBefore = node.previousSibling && 
+      node.previousSibling.nodeType === 3 && 
+      !node.previousSibling.nodeValue?.endsWith(' ');
+    
+    const needSpaceAfter = node.nextSibling && 
+      node.nextSibling.nodeType === 3 && 
+      !node.nextSibling.nodeValue?.startsWith(' ');
+
+    return (needSpaceBefore ? ' ' : '') + 
+           '**' + content + '**' + 
+           (needSpaceAfter ? ' ' : '');
+  }
+});
+
 // 获取单元格对齐方式的辅助函数
 function getCellAlignment(cell: HTMLElement): string {
   const style = cell.getAttribute('style') || '';
