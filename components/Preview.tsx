@@ -1,173 +1,75 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
-
-// 创建一个独立的样式，只应用于预览区域
-const previewStyles = `
-  .markdown-preview {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    font-size: 16px;
-    line-height: 1.8;
-    color: #333;
-    letter-spacing: 0.05em;
-    text-align: justify;
-  }
-  
-  .markdown-preview h1,
-  .markdown-preview h2,
-  .markdown-preview h3,
-  .markdown-preview h4,
-  .markdown-preview h5 {
-    font-weight: bold;
-    color: #000;
-    margin: 1.5em 0 1em;
-    line-height: 1.5;
-    letter-spacing: 0.08em;
-  }
-
-  .markdown-preview h1 {
-    font-size: 24px;
-    margin-top: 1em;
-    text-align: center;
-  }
-
-  .markdown-preview h2 {
-    font-size: 20px;
-    border-left: 4px solid #1890ff;
-    padding-left: 12px;
-  }
-
-  .markdown-preview h3 {
-    font-size: 18px;
-  }
-
-  .markdown-preview p {
-    margin: 1.5em 0;
-    line-height: 2;
-  }
-
-  .markdown-preview img {
-    max-width: 100%;
-    height: auto;
-    margin: 2em auto;
-    display: block;
-    border-radius: 4px;
-  }
-
-  .markdown-preview pre {
-    background: #f8f9fa;
-    padding: 1em;
-    margin: 1.5em 0;
-    border-radius: 4px;
-    overflow-x: auto;
-    font-size: 14px;
-    line-height: 1.6;
-    color: #24292e;
-  }
-
-  .markdown-preview code {
-    font-family: Consolas, Monaco, "Courier New", monospace;
-    background: #f0f2f5;
-    padding: 0.2em 0.4em;
-    border-radius: 3px;
-    font-size: 0.9em;
-    color: #e83e8c;
-  }
-
-  .markdown-preview pre code {
-    background: none;
-    padding: 0;
-    color: inherit;
-  }
-
-  .markdown-preview table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 2em 0;
-    font-size: 15px;
-  }
-
-  .markdown-preview th,
-  .markdown-preview td {
-    border: 1px solid #e8e8e8;
-    padding: 0.8em;
-    text-align: left;
-  }
-
-  .markdown-preview th {
-    background: #f7f7f7;
-    font-weight: 600;
-  }
-
-  .markdown-preview tr:nth-child(even) {
-    background: #fafafa;
-  }
-
-  .markdown-preview blockquote {
-    margin: 2em 0;
-    padding: 1em 1.5em;
-    background: #f8f9fa;
-    border-radius: 4px;
-    color: #666;
-    position: relative;
-  }
-
-  .markdown-preview blockquote::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: #1890ff;
-    border-radius: 2px;
-  }
-
-  .markdown-preview ul,
-  .markdown-preview ol {
-    margin: 1.5em 0;
-    padding-left: 2em;
-  }
-
-  .markdown-preview li {
-    margin: 0.5em 0;
-    line-height: 1.8;
-  }
-
-  .markdown-preview a {
-    color: #1890ff;
-    text-decoration: none;
-    border-bottom: 1px solid #1890ff;
-  }
-
-  .markdown-preview hr {
-    margin: 2em 0;
-    border: none;
-    border-top: 1px solid #e8e8e8;
-  }
-
-  .markdown-preview strong {
-    color: #222;
-    font-weight: 600;
-  }
-
-  .markdown-preview em {
-    font-style: italic;
-    color: #666;
-  }
-`;
+import type { Components } from 'react-markdown';
+import Image from 'next/image';
+import { defaultTheme } from '../themes/default';
+import { generateInlineStyles } from '../utils/themeUtils';
 
 interface PreviewProps {
   content: string;
 }
 
+interface ComponentProps {
+  children?: ReactNode;
+  [key: string]: any;
+}
+
 const Preview: React.FC<PreviewProps> = ({ content }) => {
+  const styles = generateInlineStyles(defaultTheme);
+  
+  const components: Partial<Components> = {
+    h1: ({ children }: ComponentProps) => <h1 style={styles.h1}>{children}</h1>,
+    h2: ({ children }: ComponentProps) => <h2 style={styles.h2}>{children}</h2>,
+    h3: ({ children }: ComponentProps) => <h3 style={styles.h3}>{children}</h3>,
+    p: ({ children }: ComponentProps) => <p style={styles.p}>{children}</p>,
+    img: ({ src, alt, ...props }: ComponentProps) => (
+      src ? (
+        <Image
+          src={src}
+          alt={alt || ''}
+          width={800}
+          height={600}
+          style={styles.img}
+          className="rich_pages wxw-img"
+          unoptimized={src.startsWith('data:') || src.includes('feishu.cn') || src.includes('larksuite.com')}
+        />
+      ) : null
+    ),
+    pre: ({ children }: ComponentProps) => <pre style={styles.pre}>{children}</pre>,
+    code: ({ inline, children }: ComponentProps & { inline?: boolean }) => (
+      <code style={inline ? styles.codeInline : styles.codeBlock}>
+        {children}
+      </code>
+    ),
+    table: ({ children }: ComponentProps) => <table style={styles.table}>{children}</table>,
+    th: ({ children }: ComponentProps) => <th style={styles.th}>{children}</th>,
+    td: ({ children }: ComponentProps) => <td style={styles.td}>{children}</td>,
+    blockquote: ({ children }: ComponentProps) => <blockquote style={styles.blockquote}>{children}</blockquote>,
+    ul: ({ children, depth = 0 }: ComponentProps & { depth?: number }) => (
+      <ul style={depth === 0 ? styles.ul : depth === 1 ? styles.ulNested1 : styles.ulNested2}>
+        {children}
+      </ul>
+    ),
+    ol: ({ children, depth = 0 }: ComponentProps & { depth?: number }) => (
+      <ol style={depth === 0 ? styles.ol : depth === 1 ? styles.olNested1 : styles.olNested2}>
+        {children}
+      </ol>
+    ),
+    li: ({ children }: ComponentProps) => <li style={styles.li}>{children}</li>,
+    a: ({ children, href }: ComponentProps) => (
+      <a href={href} target="_blank" rel="noopener noreferrer" style={styles.a}>
+        {children}
+      </a>
+    ),
+    hr: () => <hr style={styles.hr} />,
+    strong: ({ children }: ComponentProps) => <strong style={styles.strong}>{children}</strong>,
+    em: ({ children }: ComponentProps) => <em style={styles.em}>{children}</em>,
+  };
+
   return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: previewStyles }} />
-      <div className="markdown-preview">
-        <ReactMarkdown>{content}</ReactMarkdown>
-      </div>
-    </>
+    <div style={styles.div}>
+      <ReactMarkdown components={components}>{content}</ReactMarkdown>
+    </div>
   );
 };
 

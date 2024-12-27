@@ -5,8 +5,9 @@ import dynamic from 'next/dynamic';
 import TurndownService from 'turndown';
 import { FiCopy, FiCheck, FiSmartphone, FiMonitor } from 'react-icons/fi';
 import '@uiw/react-md-editor/markdown-editor.css';
-import '@uiw/react-markdown-preview/markdown.css';
 import Preview from '../components/Preview';
+import { defaultTheme } from '../themes/default';
+import { applyThemeStyles } from '../utils/themeUtils';
 
 const MDEditor = dynamic(
   () => import('@uiw/react-md-editor').then((mod) => mod.default),
@@ -75,7 +76,7 @@ function processImage(img: HTMLImageElement): string {
     }
   }
   
-  // 构建 HTML 格式的图���标签以保持尺寸
+  // 构建 HTML 格式的图片标签以保持尺寸
   const actualWidth = width || styleWidth;
   const actualHeight = height || styleHeight;
   
@@ -227,32 +228,7 @@ export default function Home() {
       // 复制预览区域的内容
       if (previewRef.current) {
         const content = previewRef.current.innerHTML;
-        
-        // 转换标题
-        let processedContent = content
-          .replace(/<h1[^>]*>(.*?)<\/h1>/g, '<h2 style="text-align: center; font-size: 24px; font-weight: bold;">$1</h2>')
-          .replace(/<h2[^>]*>(.*?)<\/h2>/g, '<h2 style="font-size: 20px; font-weight: bold; margin: 20px 0px; border-left: 4px solid #1890ff; padding-left: 10px;">$1</h2>')
-          .replace(/<h3[^>]*>(.*?)<\/h3>/g, '<h3 style="font-size: 18px; font-weight: bold;">$1</h3>')
-          // 处理段落
-          .replace(/<p[^>]*>(.*?)<\/p>/g, '<p style="margin: 1em 0; line-height: 2;">$1</p>')
-          // 处理列表
-          .replace(/<ul[^>]*>/g, '<ul style="margin: 1em 0; padding-left: 2em; list-style-type: disc;">')
-          .replace(/<ol[^>]*>/g, '<ol style="margin: 1em 0; padding-left: 2em; list-style-type: decimal;">')
-          .replace(/<li[^>]*>(.*?)<\/li>/g, '<li style="margin: 0.5em 0; line-height: 1.8;">$1</li>')
-          // 处理代码块
-          .replace(/<pre[^>]*>(.*?)<\/pre>/g, '<pre style="background-color: #f6f8fa; padding: 1em; border-radius: 4px; margin: 1em 0; overflow-x: auto; font-family: Consolas, Monaco, monospace; font-size: 14px;">$1</pre>')
-          .replace(/<code[^>]*>(.*?)<\/code>/g, '<code style="background-color: #f6f8fa; padding: 0.2em 0.4em; border-radius: 3px; font-family: Consolas, Monaco, monospace; font-size: 0.9em;">$1</code>')
-          // 处理引用
-          .replace(/<blockquote[^>]*>(.*?)<\/blockquote>/g, '<blockquote style="margin: 1em 0; padding: 1em; background-color: #f6f8fa; border-left: 4px solid #1890ff; color: #666666;">$1</blockquote>')
-          // 处理图片
-          .replace(/<img([^>]*)>/g, (match, attrs) => {
-            // 保留原有属性，添加样式
-            return `<img${attrs} style="max-width: 100%; display: block; margin: 1em auto;" data-type="jpeg" class="rich_pages wxw-img" />`;
-          })
-          // 处理加粗文本
-          .replace(/<strong[^>]*>(.*?)<\/strong>/g, '<strong style="font-weight: bold;">$1</strong>');
-
-        tempPreview.innerHTML = processedContent;
+        tempPreview.innerHTML = applyThemeStyles(content, defaultTheme);
       }
       
       // 创建包含样式的HTML blob
