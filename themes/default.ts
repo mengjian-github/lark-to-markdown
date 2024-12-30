@@ -17,7 +17,7 @@ export interface Theme {
       textAlign: string;
       borderBottom: string;
       paddingBottom: string;
-      position: string;
+      position: 'static' | 'relative' | 'absolute' | 'fixed' | 'sticky';
     };
     h2: {
       fontSize: string;

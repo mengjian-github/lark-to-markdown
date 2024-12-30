@@ -20,7 +20,7 @@ export function generateInlineStyles(theme: Theme) {
       letterSpacing: theme.headings.letterSpacing,
       borderBottom: theme.headings.h1.borderBottom,
       paddingBottom: theme.headings.h1.paddingBottom,
-      position: theme.headings.h1.position,
+      position: theme.headings.h1.position as 'relative',
     },
     h2: {
       fontWeight: theme.headings.fontWeight,
