@@ -15,6 +15,9 @@ export interface Theme {
       fontSize: string;
       margin: string;
       textAlign: string;
+      borderBottom: string;
+      paddingBottom: string;
+      position: string;
     };
     h2: {
       fontSize: string;
@@ -149,19 +152,22 @@ export const defaultTheme: Theme = {
     fontWeight: '600',
     letterSpacing: '0.05em',
     h1: {
-      fontSize: '20px',
-      margin: '1.2em 0 0.8em',
-      textAlign: 'left',
+      fontSize: '24px',
+      margin: '1.5em 0 1em',
+      textAlign: 'center',
+      borderBottom: '1px solid #1890ff',
+      paddingBottom: '0.5em',
+      position: 'relative',
     },
     h2: {
       fontSize: '18px',
-      margin: '1.2em 0 0.8em',
+      margin: '2em 0 1em',
       borderLeft: '4px solid #1890ff',
-      paddingLeft: '10px',
+      paddingLeft: '12px',
     },
     h3: {
-      fontSize: '16px',
-      margin: '1em 0 0.8em',
+      fontSize: '17px',
+      margin: '1.2em 0 0.8em',
     },
     h4: {
       fontSize: '15px',

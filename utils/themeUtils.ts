@@ -18,6 +18,9 @@ export function generateInlineStyles(theme: Theme) {
       textAlign: theme.headings.h1.textAlign as 'center',
       lineHeight: '1.5',
       letterSpacing: theme.headings.letterSpacing,
+      borderBottom: theme.headings.h1.borderBottom,
+      paddingBottom: theme.headings.h1.paddingBottom,
+      position: theme.headings.h1.position,
     },
     h2: {
       fontWeight: theme.headings.fontWeight,

@@ -25,17 +25,28 @@ const turndownService = new TurndownService({
 turndownService.addRule('strong', {
   filter: ['strong', 'b'],
   replacement: function (content, node, options) {
-    // 检查前后是否已经有空格
-    const needSpaceBefore = node.previousSibling && 
+    // 检查前后节点是否是 strong 标签
+    const prevIsStrong = node.previousSibling?.nodeName?.toLowerCase() === 'strong' ||
+                        node.previousSibling?.nodeName?.toLowerCase() === 'b';
+    const nextIsStrong = node.nextSibling?.nodeName?.toLowerCase() === 'strong' ||
+                        node.nextSibling?.nodeName?.toLowerCase() === 'b';
+    
+    // 如果前面是 strong，不添加前面的 **
+    const prefix = prevIsStrong ? '' : '**';
+    // 如果后面是 strong，不添加后面的 **
+    const suffix = nextIsStrong ? '' : '**';
+    
+    // 检查是否需要添加空格
+    const needSpaceBefore = !prevIsStrong && node.previousSibling && 
       node.previousSibling.nodeType === 3 && 
       !node.previousSibling.nodeValue?.endsWith(' ');
     
-    const needSpaceAfter = node.nextSibling && 
+    const needSpaceAfter = !nextIsStrong && node.nextSibling && 
       node.nextSibling.nodeType === 3 && 
       !node.nextSibling.nodeValue?.startsWith(' ');
 
     return (needSpaceBefore ? ' ' : '') + 
-           '**' + content + '**' + 
+           prefix + content.trim() + suffix + 
            (needSpaceAfter ? ' ' : '');
   }
 });
