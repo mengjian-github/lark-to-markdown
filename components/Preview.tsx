@@ -43,11 +43,13 @@ const Preview: React.FC<PreviewProps> = ({ content }) => {
       ) : null
     ),
     pre: ({ children }: ComponentProps) => <pre style={styles.pre}>{children}</pre>,
-    code: ({ inline, children }: ComponentProps & { inline?: boolean }) => (
-      <code style={inline ? styles.codeInline : styles.codeBlock}>
+    code: ({ children }: ComponentProps) => {
+      const content = children?.toString() || '';
+      const isCodeBlock = content.includes('\n');
+      return <code style={isCodeBlock ? styles.codeBlock : styles.codeInline}>
         {children}
       </code>
-    ),
+    },
     table: ({ children }: ComponentProps) => <table style={styles.table}>{children}</table>,
     th: ({ children }: ComponentProps) => <th style={styles.th}>{children}</th>,
     td: ({ children }: ComponentProps) => <td style={styles.td}>{children}</td>,

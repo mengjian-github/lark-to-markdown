@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import TurndownService from 'turndown';
-import { FiCopy, FiCheck, FiSmartphone, FiMonitor, FiSun, FiMoon, FiFeather, FiDroplet } from 'react-icons/fi';
+import { FiCopy, FiCheck, FiSmartphone, FiMonitor, FiSun, FiDroplet, FiFeather } from 'react-icons/fi';
 import '@uiw/react-md-editor/markdown-editor.css';
 import Preview from '../components/Preview';
 import { defaultTheme } from '../themes/default';
@@ -387,13 +387,13 @@ const Home: React.FC = () => {
                 key={name}
                 onClick={() => setTheme(name as ThemeName)}
                 title={title}
-                className={`w-12 h-12 flex items-center justify-center rounded-full 
+                className={`w-10 h-10 flex items-center justify-center rounded-full 
                   ${themeName === name 
-                    ? 'bg-purple-500 text-white' 
+                    ? 'bg-blue-500 text-white' 
                     : 'bg-white text-gray-600 hover:bg-gray-100'
-                  } shadow-lg transition-all duration-200 hover:scale-110`}
+                  } shadow-lg transition-all duration-75 hover:scale-105`}
               >
-                <Icon className="w-6 h-6" />
+                <Icon className="w-5 h-5" />
               </button>
             ))}
           </div>
@@ -402,25 +402,25 @@ const Home: React.FC = () => {
           <button
             onClick={() => setIsMobilePreview(!isMobilePreview)}
             title={isMobilePreview ? '切换到电脑预览' : '切换到手机预览'}
-            className="w-12 h-12 flex items-center justify-center rounded-full bg-purple-500 hover:bg-purple-600 text-white shadow-lg transition-all duration-200 hover:scale-110"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-lg transition-all duration-75 hover:scale-105"
           >
             {isMobilePreview ? (
-              <FiMonitor className="w-6 h-6" />
+              <FiMonitor className="w-5 h-5" />
             ) : (
-              <FiSmartphone className="w-6 h-6" />
+              <FiSmartphone className="w-5 h-5" />
             )}
           </button>
 
           {/* 复制按钮 */}
           <button
             onClick={handleCopyToWeixin}
-            title={copied ? '复制成功！' : '复制到公众号'}
-            className="w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-lg transition-all duration-200 hover:scale-110"
+            title={copied ? '已复制' : '复制到公众号'}
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-500 hover:bg-blue-600 text-white shadow-lg transition-all duration-75 hover:scale-105"
           >
             {copied ? (
-              <FiCheck className="w-6 h-6" />
+              <FiCheck className="w-5 h-5" />
             ) : (
-              <FiCopy className="w-6 h-6" />
+              <FiCopy className="w-5 h-5" />
             )}
           </button>
         </div>

@@ -68,6 +68,7 @@ export interface Theme {
       padding: string;
       borderRadius: string;
       color: string;
+      fontFamily: string;
     };
   };
   table: {
@@ -208,6 +209,7 @@ export const defaultTheme: Theme = {
       padding: '2px 4px',
       borderRadius: '3px',
       color: '#d63384',
+      fontFamily: 'Consolas, Monaco, "Courier New", monospace',
     },
   },
   table: {

@@ -76,14 +76,15 @@ export function generateInlineStyles(theme: Theme) {
       borderRadius: theme.image.borderRadius,
     },
     pre: {
+      fontFamily: theme.code.fontFamily,
+      fontSize: theme.code.fontSize,
+      lineHeight: theme.code.lineHeight,
       background: theme.code.block.background,
       padding: theme.code.block.padding,
       margin: theme.code.block.margin,
       borderRadius: theme.code.block.borderRadius,
-      overflowX: 'auto' as const,
-      fontSize: theme.code.fontSize,
-      lineHeight: theme.code.lineHeight,
       color: theme.code.block.color,
+      overflow: 'auto',
     },
     codeInline: {
       fontFamily: theme.code.fontFamily,
@@ -174,6 +175,15 @@ export function generateInlineStyles(theme: Theme) {
       color: theme.emphasis.em.color,
       fontStyle: theme.emphasis.em.fontStyle,
     },
+    code: {
+      fontFamily: theme.code.fontFamily,
+      fontSize: theme.code.fontSize,
+      lineHeight: theme.code.lineHeight,
+      background: theme.code.inline.background,
+      padding: theme.code.inline.padding,
+      borderRadius: theme.code.inline.borderRadius,
+      color: theme.code.inline.color,
+    },
   };
 }
 
@@ -211,8 +221,20 @@ export function applyThemeStyles(content: string, theme: Theme) {
     })
     .replace(/<pre[^>]*>([\s\S]*?)<\/pre>/g, `<pre style="${styleToString(styles.pre)}">$1</pre>`)
     .replace(/<code[^>]*>([\s\S]*?)<\/code>/g, (match, content) => {
-      const isInPre = match.includes('class="language-');
-      return `<code style="${styleToString(isInPre ? styles.codeBlock : styles.codeInline)}">${content}</code>`;
+      // 检查是否在 pre 标签内（代码块）
+      const isInPre = match.includes('class="language-') || match.includes('<pre');
+      // 如果是代码块使用 codeBlock 样式，否则使用 codeInline 样式
+      const style = isInPre ? styles.codeBlock : {
+        ...styles.codeInline,
+        fontFamily: theme.code.inline.fontFamily,
+        fontSize: theme.code.fontSize,
+        lineHeight: theme.code.lineHeight,
+        background: theme.code.inline.background,
+        padding: theme.code.inline.padding,
+        borderRadius: theme.code.inline.borderRadius,
+        color: theme.code.inline.color,
+      };
+      return `<code style="${styleToString(style)}">${content}</code>`;
     })
     .replace(/<table[^>]*>/g, `<table style="${styleToString(styles.table)}">`)
     .replace(/<th[^>]*>(.*?)<\/th>/g, `<th style="${styleToString(styles.th)}">$1</th>`)
