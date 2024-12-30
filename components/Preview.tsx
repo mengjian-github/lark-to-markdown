@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import type { Components } from 'react-markdown';
 import Image from 'next/image';
 import { generateInlineStyles } from '../utils/themeUtils';
@@ -51,8 +52,12 @@ const Preview: React.FC<PreviewProps> = ({ content }) => {
       </code>
     },
     table: ({ children }: ComponentProps) => <table style={styles.table}>{children}</table>,
-    th: ({ children }: ComponentProps) => <th style={styles.th}>{children}</th>,
-    td: ({ children }: ComponentProps) => <td style={styles.td}>{children}</td>,
+    th: ({ children, style: cellStyle }: ComponentProps) => (
+      <th style={{ ...styles.th, ...cellStyle }}>{children}</th>
+    ),
+    td: ({ children, style: cellStyle }: ComponentProps) => (
+      <td style={{ ...styles.td, ...cellStyle }}>{children}</td>
+    ),
     blockquote: ({ children }: ComponentProps) => <blockquote style={styles.blockquote}>{children}</blockquote>,
     ul: ({ children, depth = 0 }: ComponentProps & { depth?: number }) => (
       <ul style={depth === 0 ? styles.ul : depth === 1 ? styles.ulNested1 : styles.ulNested2}>
@@ -77,7 +82,12 @@ const Preview: React.FC<PreviewProps> = ({ content }) => {
 
   return (
     <div style={styles.div}>
-      <ReactMarkdown components={components}>{content}</ReactMarkdown>
+      <ReactMarkdown 
+        remarkPlugins={[remarkGfm]} 
+        components={components}
+      >
+        {content}
+      </ReactMarkdown>
     </div>
   );
 };

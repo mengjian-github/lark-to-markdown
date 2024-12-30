@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@types/next": "^9.0.0",
-    "@uiw/react-md-editor": "^3.25.6",
     "@uiw/react-markdown-preview": "^4.1.16",
+    "@uiw/react-md-editor": "^3.25.6",
     "next": "14.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

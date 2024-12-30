@@ -75,13 +75,17 @@ export interface Theme {
     width: string;
     margin: string;
     fontSize: string;
-    borderColor: string;
+    borderCollapse: string;
+    borderSpacing: string;
+    border: string;
     cell: {
       padding: string;
+      border: string;
     };
     header: {
       background: string;
       fontWeight: string;
+      border: string;
     };
   };
   blockquote: {
@@ -216,13 +220,17 @@ export const defaultTheme: Theme = {
     width: '100%',
     margin: '1em 0',
     fontSize: '14px',
-    borderColor: '#eaeaea',
+    borderCollapse: 'collapse',
+    borderSpacing: '0',
+    border: '1px solid #e5e7eb',
     cell: {
-      padding: '8px',
+      padding: '8px 16px',
+      border: '1px solid #e5e7eb',
     },
     header: {
-      background: '#fafafa',
+      background: '#f9fafb',
       fontWeight: '600',
+      border: '1px solid #e5e7eb',
     },
   },
   blockquote: {

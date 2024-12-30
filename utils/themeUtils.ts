@@ -102,18 +102,18 @@ export function generateInlineStyles(theme: Theme) {
       width: theme.table.width,
       margin: theme.table.margin,
       fontSize: theme.table.fontSize,
+      borderSpacing: theme.table.borderSpacing,
+      border: theme.table.border,
     },
     th: {
-      border: `1px solid ${theme.table.borderColor}`,
+      border: theme.table.header.border,
       padding: theme.table.cell.padding,
-      textAlign: 'left' as const,
       background: theme.table.header.background,
       fontWeight: theme.table.header.fontWeight,
     },
     td: {
-      border: `1px solid ${theme.table.borderColor}`,
+      border: theme.table.cell.border,
       padding: theme.table.cell.padding,
-      textAlign: 'left' as const,
     },
     blockquote: {
       margin: theme.blockquote.margin,

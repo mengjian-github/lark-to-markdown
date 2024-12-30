@@ -15,7 +15,14 @@ const nextConfig = {
       'sf3-cn.feishucdn.com',
       'lf3-static.bytednsdoc.com',
       'p3-hera.byteimg.com',
+      'p3-juejin.byteimg.com',
+      'p1-juejin.byteimg.com',
+      'p2-juejin.byteimg.com',
+      'p4-juejin.byteimg.com',
+      'p5-juejin.byteimg.com',
+      'p6-juejin.byteimg.com',
     ],
+    unoptimized: true,
   },
 }
 
