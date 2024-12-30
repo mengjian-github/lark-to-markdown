@@ -1,6 +1,8 @@
 import React, { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneLight } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import type { Components } from 'react-markdown';
 import Image from 'next/image';
 import { generateInlineStyles } from '../utils/themeUtils';
@@ -44,12 +46,38 @@ const Preview: React.FC<PreviewProps> = ({ content }) => {
       ) : null
     ),
     pre: ({ children }: ComponentProps) => <pre style={styles.pre}>{children}</pre>,
-    code: ({ children }: ComponentProps) => {
-      const content = children?.toString() || '';
-      const isCodeBlock = content.includes('\n');
-      return <code style={isCodeBlock ? styles.codeBlock : styles.codeInline}>
-        {children}
-      </code>
+    code: ({ node, inline, className, children, ...props }: ComponentProps & { inline?: boolean; className?: string }) => {
+      const match = /language-(\w+)/.exec(className || '');
+      const content = String(children).replace(/\n$/, '');
+      
+      if (!inline && match) {
+        // 代码块
+        const codeStyle = {
+          fontFamily: styles.code.fontFamily,
+          fontSize: styles.code.fontSize,
+          lineHeight: styles.code.lineHeight,
+          background: styles.pre.background,
+          padding: styles.pre.padding,
+          margin: styles.pre.margin,
+          borderRadius: styles.pre.borderRadius,
+          color: styles.pre.color,
+        };
+        
+        return (
+          <SyntaxHighlighter
+            style={oneLight}
+            language={match[1]}
+            PreTag="div"
+            customStyle={codeStyle}
+            {...props}
+          >
+            {content}
+          </SyntaxHighlighter>
+        );
+      } else {
+        // 行内代码
+        return <code style={styles.codeInline} {...props}>{children}</code>;
+      }
     },
     table: ({ children }: ComponentProps) => <table style={styles.table}>{children}</table>,
     th: ({ children, style: cellStyle }: ComponentProps) => (
