@@ -24,10 +24,12 @@ export interface Theme {
       margin: string;
       borderLeft: string;
       paddingLeft: string;
+      color: string;
     };
     h3: {
       fontSize: string;
       margin: string;
+      color: string;
     };
     h4: {
       fontSize: string;
@@ -153,7 +155,7 @@ export const defaultTheme: Theme = {
     textAlign: 'left',
   },
   headings: {
-    color: '#222222',
+    color: '#1890ff',
     fontWeight: '600',
     letterSpacing: '0.05em',
     h1: {
@@ -165,14 +167,16 @@ export const defaultTheme: Theme = {
       position: 'relative',
     },
     h2: {
-      fontSize: '18px',
+      fontSize: '20px',
       margin: '2em 0 1em',
       borderLeft: '4px solid #1890ff',
       paddingLeft: '12px',
+      color: '#1890ff',
     },
     h3: {
       fontSize: '17px',
       margin: '1.2em 0 0.8em',
+      color: '#40a9ff',
     },
     h4: {
       fontSize: '15px',

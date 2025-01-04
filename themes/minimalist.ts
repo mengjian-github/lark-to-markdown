@@ -22,14 +22,16 @@ export const minimalistTheme: Theme = {
       position: 'relative',
     },
     h2: {
-      fontSize: '18px',
+      fontSize: '20px',
       margin: '2em 0 1em',
       borderLeft: '2px solid #34495e',
       paddingLeft: '12px',
+      color: '#34495e',
     },
     h3: {
       fontSize: '17px',
       margin: '1.2em 0 0.8em',
+      color: '#3498db',
     },
     h4: {
       fontSize: '15px',

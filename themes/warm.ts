@@ -10,7 +10,7 @@ export const warmTheme: Theme = {
     textAlign: 'left',
   },
   headings: {
-    color: '#2c3e50',
+    color: '#e67e22',
     fontWeight: '600',
     letterSpacing: '0.05em',
     h1: {
@@ -22,14 +22,16 @@ export const warmTheme: Theme = {
       position: 'relative',
     },
     h2: {
-      fontSize: '18px',
+      fontSize: '20px',
       margin: '2em 0 1em',
       borderLeft: '4px solid #e67e22',
       paddingLeft: '12px',
+      color: '#e67e22',
     },
     h3: {
       fontSize: '17px',
       margin: '1.2em 0 0.8em',
+      color: '#f39c12',
     },
     h4: {
       fontSize: '15px',
