@@ -267,19 +267,28 @@ export function applyThemeStyles(content: string, theme: Theme) {
         index = parseInt(list.getAttribute('start') || '1') || 1;
       }
       
+      // 获取原始列表的样式
+      const listStyle = list.getAttribute('style') || '';
+      
       // 创建替换元素
       const replacementDiv = doc.createElement('div');
       replacementDiv.className = isOrdered ? 'wx-ol' : 'wx-ul';
-      replacementDiv.style.cssText = isOrdered 
-        ? styleToString(styles.ol) + `;padding-left:${level > 0 ? '1em' : '2em'};margin-left:0;`
-        : styleToString(styles.ul) + `;padding-left:${level > 0 ? '1em' : '2em'};margin-left:0;`;
+      
+      // 保留原始样式并添加新样式
+      const baseStyle = isOrdered ? styleToString(styles.ol) : styleToString(styles.ul);
+      replacementDiv.style.cssText = `${listStyle};${baseStyle};padding-left:${level > 0 ? '1em' : '2em'};margin-left:0;`;
       
       // 处理列表项
       const items = list.querySelectorAll(':scope > li');
       items.forEach((item: Element) => {
+        // 获取原始列表项的样式
+        const itemStyle = item.getAttribute('style') || '';
+        
         const itemDiv = doc.createElement('div');
         itemDiv.className = 'wx-li';
-        itemDiv.style.cssText = styleToString({
+        
+        // 合并原始样式和新样式
+        const baseItemStyle = styleToString({
           ...styles.li,
           position: 'relative',
           display: 'block',
@@ -287,6 +296,8 @@ export function applyThemeStyles(content: string, theme: Theme) {
           paddingLeft: '1.5em',
           boxSizing: 'border-box'
         });
+        
+        itemDiv.style.cssText = `${itemStyle};${baseItemStyle}`;
         
         // 创建前缀标记
         const prefixSpan = doc.createElement('span');
@@ -374,4 +385,14 @@ export function applyThemeStyles(content: string, theme: Theme) {
     .replace(/<hr[^>]*>/g, `<hr style="${styleToString(styles.hr)}" />`)
     .replace(/<strong[^>]*>(.*?)<\/strong>/g, `<strong style="${styleToString(styles.strong)}">$1</strong>`)
     .replace(/<em[^>]*>(.*?)<\/em>/g, `<em style="${styleToString(styles.em)}">$1</em>`);
+}
+
+/**
+ * 用于测试列表处理逻辑的函数
+ * @param content 包含列表的HTML内容
+ * @param theme 主题配置
+ * @returns 处理后的HTML
+ */
+export function testListProcessing(content: string, theme: Theme) {
+  return applyThemeStyles(content, theme);
 } 
