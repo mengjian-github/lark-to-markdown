@@ -64,6 +64,9 @@ export interface Theme {
       margin: string;
       borderRadius: string;
       color: string;
+      overflow?: string;
+      fontSize?: string;
+      lineHeight?: string;
     };
     inline: {
       background: string;
@@ -71,6 +74,7 @@ export interface Theme {
       borderRadius: string;
       color: string;
       fontFamily: string;
+      fontSize?: string;
     };
   };
   table: {
@@ -97,6 +101,7 @@ export interface Theme {
     borderRadius: string;
     color: string;
     borderLeft: string;
+    fontStyle?: string;
   };
   list: {
     margin: string;
@@ -150,46 +155,46 @@ export const defaultTheme: Theme = {
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
     fontSize: '15px',
     lineHeight: '1.75',
-    color: '#333333',
+    color: '#2a2a2a',
     letterSpacing: '0.03em',
     textAlign: 'left',
   },
   headings: {
-    color: '#1890ff',
+    color: '#0e6efd',
     fontWeight: '600',
     letterSpacing: '0.05em',
     h1: {
-      fontSize: '24px',
-      margin: '1.5em 0 1em',
+      fontSize: '26px',
+      margin: '1.8em 0 1em',
       textAlign: 'center',
-      borderBottom: '1px solid #1890ff',
+      borderBottom: '1px solid #0e6efd',
       paddingBottom: '0.5em',
       position: 'relative',
     },
     h2: {
-      fontSize: '20px',
+      fontSize: '21px',
       margin: '2em 0 1em',
-      borderLeft: '4px solid #1890ff',
+      borderLeft: '4px solid #0e6efd',
       paddingLeft: '12px',
-      color: '#1890ff',
+      color: '#0e6efd',
     },
     h3: {
-      fontSize: '17px',
-      margin: '1.2em 0 0.8em',
-      color: '#40a9ff',
+      fontSize: '18px',
+      margin: '1.5em 0 0.8em',
+      color: '#3695ff',
     },
     h4: {
-      fontSize: '15px',
-      margin: '1em 0 0.8em',
+      fontSize: '16px',
+      margin: '1.2em 0 0.8em',
     },
     h5: {
-      fontSize: '14px',
+      fontSize: '15px',
       margin: '1em 0 0.8em',
     },
     h6: {
       fontSize: '14px',
       margin: '1em 0 0.8em',
-      color: '#666666',
+      color: '#555555',
     },
   },
   paragraph: {
@@ -206,18 +211,22 @@ export const defaultTheme: Theme = {
     fontSize: '13px',
     lineHeight: '1.6',
     block: {
-      background: '#f7f7f7',
-      padding: '12px',
-      margin: '1em 0',
-      borderRadius: '4px',
+      margin: '1.5em 0',
+      padding: '1em',
+      borderRadius: '5px',
+      background: '#f6f8fa',
       color: '#333333',
+      overflow: 'auto',
+      fontSize: '14px',
+      lineHeight: '1.6',
     },
     inline: {
-      background: '#f7f7f7',
-      padding: '2px 4px',
+      padding: '0.2em 0.4em',
       borderRadius: '3px',
-      color: '#d63384',
+      background: '#f3f3f3',
+      color: '#0e6efd',
       fontFamily: 'Consolas, Monaco, "Courier New", monospace',
+      fontSize: '85%',
     },
   },
   table: {
@@ -238,12 +247,13 @@ export const defaultTheme: Theme = {
     },
   },
   blockquote: {
-    margin: '1em 0',
-    padding: '12px 16px',
-    background: '#fafafa',
-    borderRadius: '4px',
-    color: '#666666',
-    borderLeft: '4px solid #1890ff',
+    margin: '1.5em 0',
+    padding: '0 0 0 1em',
+    borderLeft: '4px solid #0e6efd88',
+    fontStyle: 'italic',
+    color: '#555555',
+    background: 'transparent',
+    borderRadius: '0',
   },
   list: {
     margin: '1em 0',
