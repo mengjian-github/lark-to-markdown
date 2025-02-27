@@ -247,127 +247,6 @@ export function applyThemeStyles(content: string, theme: Theme) {
       }
     });
 
-  // 处理列表 - 采用新的更健壮的方法
-  // 基本思路: 先将所有HTML内容转换为DOM结构，然后遍历处理列表元素
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(`<div id="root">${processedContent}</div>`, 'text/html');
-  const rootElement = doc.getElementById('root');
-
-  // 递归处理列表
-  function processLists(element: Element, level = 0, startIndex = 1) {
-    // 使用深度优先搜索查找所有列表
-    // 步骤1: 找出所有列表元素（不管嵌套多深）
-    const findAllLists = (el: Element): Element[] => {
-      let result: Element[] = [];
-      
-      // 检查当前元素是否是列表
-      if (el.tagName && (el.tagName.toLowerCase() === 'ul' || el.tagName.toLowerCase() === 'ol')) {
-        result.push(el);
-      }
-      
-      // 遍历直接子元素
-      Array.from(el.children).forEach(child => {
-        // 不要递归到列表项内部查找列表，这些会在后续递归中处理
-        if (child.tagName && child.tagName.toLowerCase() !== 'li') {
-          result = result.concat(findAllLists(child));
-        }
-      });
-      
-      return result;
-    };
-    
-    // 获取当前元素下的所有列表（不包括列表项内的列表）
-    const lists = findAllLists(element);
-    
-    lists.forEach((list: Element) => {
-      const isOrdered = list.tagName.toLowerCase() === 'ol';
-      let index = startIndex;
-      
-      // 如果是有序列表，检查是否有指定起始索引
-      if (isOrdered && list.hasAttribute('start')) {
-        index = parseInt(list.getAttribute('start') || '1') || 1;
-      }
-      
-      // 获取原始列表的样式
-      const listStyle = list.getAttribute('style') || '';
-      
-      // 创建替换元素
-      const replacementDiv = doc.createElement('div');
-      replacementDiv.className = isOrdered ? 'wx-ol' : 'wx-ul';
-      
-      // 保留原始样式并添加新样式
-      const baseStyle = isOrdered ? styleToString(styles.ol) : styleToString(styles.ul);
-      replacementDiv.style.cssText = `${listStyle};${baseStyle};padding-left:${level > 0 ? '1em' : '2em'};margin-left:0;`;
-      
-      // 处理列表项 - 使用更兼容的方法
-      let items: Element[] = [];
-      
-      // 遍历子节点，找出li元素
-      Array.from(list.children).forEach(child => {
-        if (child.tagName && child.tagName.toLowerCase() === 'li') {
-          items.push(child);
-        }
-      });
-      
-      items.forEach((item: Element) => {
-        // 获取原始列表项的样式
-        const itemStyle = item.getAttribute('style') || '';
-        
-        const itemDiv = doc.createElement('div');
-        itemDiv.className = 'wx-li';
-        
-        // 合并原始样式和新样式
-        const baseItemStyle = styleToString({
-          ...styles.li,
-          position: 'relative',
-          display: 'block',
-          marginLeft: '0.5em',
-          paddingLeft: '1.5em',
-          boxSizing: 'border-box'
-        });
-        
-        itemDiv.style.cssText = `${itemStyle};${baseItemStyle}`;
-        
-        // 创建前缀标记
-        const prefixSpan = doc.createElement('span');
-        prefixSpan.style.cssText = 'position:absolute;left:0;top:0;';
-        
-        if (isOrdered) {
-          prefixSpan.textContent = `${index++}.`;
-        } else {
-          prefixSpan.textContent = '•';
-          prefixSpan.style.fontWeight = 'bold';
-        }
-        
-        // 复制原始内容
-        while (item.firstChild) {
-          itemDiv.appendChild(item.firstChild);
-        }
-        
-        // 添加前缀
-        itemDiv.insertBefore(prefixSpan, itemDiv.firstChild);
-        
-        // 递归处理嵌套列表 - 这些嵌套列表现在在itemDiv中
-        processLists(itemDiv, level + 1, 1);
-        
-        replacementDiv.appendChild(itemDiv);
-      });
-      
-      // 替换原列表
-      if (list.parentNode) {
-        list.parentNode.replaceChild(replacementDiv, list);
-      }
-    });
-  }
-  
-  if (rootElement) {
-    // 开始处理根元素下的所有列表
-    processLists(rootElement);
-    
-    // 获取处理后的HTML
-    processedContent = rootElement.innerHTML;
-  }
-
   // 然后处理其他元素
   return processedContent
     .replace(/<div[^>]*>/g, `<div style="${styleToString(styles.div)}">`)
@@ -410,18 +289,11 @@ export function applyThemeStyles(content: string, theme: Theme) {
       return `<code style="${styleToString(style)}">${content}</code>`;
     })
     .replace(/<blockquote[^>]*>(.*?)<\/blockquote>/g, `<blockquote style="${styleToString(styles.blockquote)}">$1</blockquote>`)
+    .replace(/<ul[^>]*>/g, `<ul style="${styleToString(styles.ul)}">`)
+    .replace(/<ol[^>]*>/g, `<ol style="${styleToString(styles.ol)}">`)
+    .replace(/<li[^>]*>(.*?)<\/li>/g, `<li style="${styleToString(styles.li)}">$1</li>`)
     .replace(/<a([^>]*)>(.*?)<\/a>/g, `<a$1 style="${styleToString(styles.a)}">$2</a>`)
     .replace(/<hr[^>]*>/g, `<hr style="${styleToString(styles.hr)}" />`)
     .replace(/<strong[^>]*>(.*?)<\/strong>/g, `<strong style="${styleToString(styles.strong)}">$1</strong>`)
     .replace(/<em[^>]*>(.*?)<\/em>/g, `<em style="${styleToString(styles.em)}">$1</em>`);
-}
-
-/**
- * 用于测试列表处理逻辑的函数
- * @param content 包含列表的HTML内容
- * @param theme 主题配置
- * @returns 处理后的HTML
- */
-export function testListProcessing(content: string, theme: Theme) {
-  return applyThemeStyles(content, theme);
 } 
