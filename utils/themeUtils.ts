@@ -252,11 +252,18 @@ export function applyThemeStyles(content: string, theme: Theme) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(`<div id="root">${processedContent}</div>`, 'text/html');
   const rootElement = doc.getElementById('root');
-  
+
   // 递归处理列表
   function processLists(element: Element, level = 0, startIndex = 1) {
-    // 找出所有直接子列表
-    const lists = element.querySelectorAll(':scope > ul, :scope > ol');
+    // 找出所有直接子列表 - 使用更兼容的方法
+    let lists: Element[] = [];
+    
+    // 遍历子节点，找出ul和ol元素
+    Array.from(element.children).forEach(child => {
+      if (child.tagName && (child.tagName.toLowerCase() === 'ul' || child.tagName.toLowerCase() === 'ol')) {
+        lists.push(child);
+      }
+    });
     
     lists.forEach((list: Element) => {
       const isOrdered = list.tagName.toLowerCase() === 'ol';
@@ -278,8 +285,16 @@ export function applyThemeStyles(content: string, theme: Theme) {
       const baseStyle = isOrdered ? styleToString(styles.ol) : styleToString(styles.ul);
       replacementDiv.style.cssText = `${listStyle};${baseStyle};padding-left:${level > 0 ? '1em' : '2em'};margin-left:0;`;
       
-      // 处理列表项
-      const items = list.querySelectorAll(':scope > li');
+      // 处理列表项 - 使用更兼容的方法
+      let items: Element[] = [];
+      
+      // 遍历子节点，找出li元素
+      Array.from(list.children).forEach(child => {
+        if (child.tagName && child.tagName.toLowerCase() === 'li') {
+          items.push(child);
+        }
+      });
+      
       items.forEach((item: Element) => {
         // 获取原始列表项的样式
         const itemStyle = item.getAttribute('style') || '';
