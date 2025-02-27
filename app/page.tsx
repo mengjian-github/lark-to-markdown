@@ -6,8 +6,6 @@ import TurndownService from 'turndown';
 import { FiCopy, FiCheck, FiSmartphone, FiMonitor, FiSun, FiDroplet, FiFeather } from 'react-icons/fi';
 import '@uiw/react-md-editor/markdown-editor.css';
 import Preview from '../components/Preview';
-import { defaultTheme } from '../themes/default';
-import { applyThemeStyles } from '../utils/themeUtils';
 import { ThemeProvider, useTheme, ThemeName } from '../contexts/ThemeContext';
 
 const MDEditor = dynamic(
@@ -308,22 +306,8 @@ const Home: React.FC = () => {
 
   const handleCopyToWeixin = async () => {
     try {
-      const container = document.createElement('div');
-      container.style.position = 'absolute';
-      container.style.left = '-9999px';
-      document.body.appendChild(container);
-
-      // 创建一个临时的预览容器
-      const tempPreview = document.createElement('div');
-      
-      // 复制预览区域的内容
-      if (previewRef.current) {
-        const content = previewRef.current.innerHTML;
-        tempPreview.innerHTML = applyThemeStyles(content, currentTheme);
-      }
-      
       // 创建包含样式的HTML blob
-      const blob = new Blob([tempPreview.innerHTML], { type: 'text/html' });
+      const blob = new Blob([previewRef.current?.innerHTML || ''], { type: 'text/html' });
       
       // 复制到剪贴板
       await navigator.clipboard.write([
@@ -331,9 +315,6 @@ const Home: React.FC = () => {
           'text/html': blob
         })
       ]);
-      
-      // 清理
-      document.body.removeChild(container);
       
       // 显示成功提示
       setCopied(true);
