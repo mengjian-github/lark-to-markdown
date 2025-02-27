@@ -247,75 +247,86 @@ export function applyThemeStyles(content: string, theme: Theme) {
       }
     });
 
-  // 处理列表元素转换为div
-  // 创建一个映射，用于跟踪有序列表的计数
-  const olCounters: Record<string, number> = {};
-  const listNestingLevel: string[] = [];
-  let currentOlId = 0;
-
-  // 处理无序列表 - 转换为div
-  processedContent = processedContent.replace(/<ul([^>]*)>/g, (match, attrs) => {
-    // 生成新的无序列表容器div，样式与原ul一致
-    const ulStyle = styleToString(styles.ul);
-    // 添加嵌套级别跟踪
-    listNestingLevel.push('ul');
-    return `<div class="wx-ul" style="${ulStyle};padding-left:2em;margin-left:0">`;
-  });
-
-  // 处理有序列表 - 转换为div
-  processedContent = processedContent.replace(/<ol([^>]*)>/g, (match, attrs) => {
-    // 每个ol获取唯一ID，用于跟踪计数
-    const olId = `ol-${currentOlId++}`;
-    olCounters[olId] = 1;
-    // 添加嵌套级别跟踪
-    listNestingLevel.push(olId);
-    // 生成新的有序列表容器div，样式与原ol一致
-    const olStyle = styleToString(styles.ol);
-    return `<div class="wx-ol" style="${olStyle};padding-left:2em;margin-left:0">`;
-  });
-
-  // 处理列表项 - 转换为带有项目符号或序号的div
-  processedContent = processedContent.replace(/<li([^>]*)>([\s\S]*?)<\/li>/g, (match, attrs, content) => {
-    // 确定当前列表项属于哪种列表类型
-    const currentListType = listNestingLevel[listNestingLevel.length - 1] || 'ul';
-    let prefix = '';
-    let indent = listNestingLevel.length > 1 ? (listNestingLevel.length - 1) * 1.5 : 0;
+  // 处理列表 - 采用新的更健壮的方法
+  // 基本思路: 先将所有HTML内容转换为DOM结构，然后遍历处理列表元素
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(`<div id="root">${processedContent}</div>`, 'text/html');
+  const rootElement = doc.getElementById('root');
+  
+  // 递归处理列表
+  function processLists(element: Element, level = 0, startIndex = 1) {
+    // 找出所有直接子列表
+    const lists = element.querySelectorAll(':scope > ul, :scope > ol');
     
-    if (currentListType === 'ul') {
-      // 无序列表项，使用圆点作为前缀
-      prefix = '• ';
-    } else {
-      // 有序列表项，使用序号作为前缀
-      const olId = currentListType;
-      prefix = `${olCounters[olId]}. `;
-      olCounters[olId]++;
-    }
-    
-    // 生成新的列表项div，样式与原li一致，添加前缀
-    const liStyle = styleToString({
-      ...styles.li,
-      position: 'relative',
-      display: 'block',
-      marginLeft: `${indent}em`,
+    lists.forEach((list: Element) => {
+      const isOrdered = list.tagName.toLowerCase() === 'ol';
+      let index = startIndex;
+      
+      // 如果是有序列表，检查是否有指定起始索引
+      if (isOrdered && list.hasAttribute('start')) {
+        index = parseInt(list.getAttribute('start') || '1') || 1;
+      }
+      
+      // 创建替换元素
+      const replacementDiv = doc.createElement('div');
+      replacementDiv.className = isOrdered ? 'wx-ol' : 'wx-ul';
+      replacementDiv.style.cssText = isOrdered 
+        ? styleToString(styles.ol) + `;padding-left:${level > 0 ? '1em' : '2em'};margin-left:0;`
+        : styleToString(styles.ul) + `;padding-left:${level > 0 ? '1em' : '2em'};margin-left:0;`;
+      
+      // 处理列表项
+      const items = list.querySelectorAll(':scope > li');
+      items.forEach((item: Element) => {
+        const itemDiv = doc.createElement('div');
+        itemDiv.className = 'wx-li';
+        itemDiv.style.cssText = styleToString({
+          ...styles.li,
+          position: 'relative',
+          display: 'block',
+          marginLeft: '0.5em',
+          paddingLeft: '1.5em',
+          boxSizing: 'border-box'
+        });
+        
+        // 创建前缀标记
+        const prefixSpan = doc.createElement('span');
+        prefixSpan.style.cssText = 'position:absolute;left:0;top:0;';
+        
+        if (isOrdered) {
+          prefixSpan.textContent = `${index++}.`;
+        } else {
+          prefixSpan.textContent = '•';
+          prefixSpan.style.fontWeight = 'bold';
+        }
+        
+        // 复制原始内容
+        while (item.firstChild) {
+          itemDiv.appendChild(item.firstChild);
+        }
+        
+        // 添加前缀
+        itemDiv.insertBefore(prefixSpan, itemDiv.firstChild);
+        
+        // 递归处理嵌套列表 - 这些嵌套列表现在在itemDiv中
+        processLists(itemDiv, level + 1, 1);
+        
+        replacementDiv.appendChild(itemDiv);
+      });
+      
+      // 替换原列表
+      if (list.parentNode) {
+        list.parentNode.replaceChild(replacementDiv, list);
+      }
     });
+  }
+  
+  if (rootElement) {
+    // 开始处理根元素下的所有列表
+    processLists(rootElement);
     
-    return `<div class="wx-li" style="${liStyle}"><span style="position:absolute;left:-1.5em;font-weight:${currentListType === 'ul' ? 'bold' : 'normal'}">${prefix}</span>${content}</div>`;
-  });
-
-  // 结束列表时，弹出嵌套级别跟踪
-  processedContent = processedContent.replace(/<\/ul>/g, () => {
-    if (listNestingLevel.length > 0) {
-      listNestingLevel.pop();
-    }
-    return '</div>';
-  });
-
-  processedContent = processedContent.replace(/<\/ol>/g, () => {
-    if (listNestingLevel.length > 0) {
-      listNestingLevel.pop();
-    }
-    return '</div>';
-  });
+    // 获取处理后的HTML
+    processedContent = rootElement.innerHTML;
+  }
 
   // 然后处理其他元素
   return processedContent
