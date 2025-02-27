@@ -306,8 +306,28 @@ const Home: React.FC = () => {
 
   const handleCopyToWeixin = async () => {
     try {
-      // 创建包含样式的HTML blob
-      const blob = new Blob([previewRef.current?.innerHTML || ''], { type: 'text/html' });
+      // 获取HTML内容
+      const htmlContent = previewRef.current?.innerHTML || '';
+      
+      // 创建临时DOM元素用于处理HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = htmlContent;
+      
+      // 处理所有列表项中的内容
+      tempDiv.querySelectorAll('li').forEach(li => {
+        // 如果列表项中直接包含文本节点，将其包装在span中
+        Array.from(li.childNodes).forEach(node => {
+          if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
+            const span = document.createElement('span');
+            span.style.display = 'inline';
+            span.textContent = node.textContent;
+            node.parentNode?.replaceChild(span, node);
+          }
+        });
+      });
+      
+      // 创建包含处理后样式的HTML blob
+      const blob = new Blob([tempDiv.innerHTML], { type: 'text/html' });
       
       // 复制到剪贴板
       await navigator.clipboard.write([
