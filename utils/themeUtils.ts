@@ -255,15 +255,29 @@ export function applyThemeStyles(content: string, theme: Theme) {
 
   // 递归处理列表
   function processLists(element: Element, level = 0, startIndex = 1) {
-    // 找出所有直接子列表 - 使用更兼容的方法
-    let lists: Element[] = [];
-    
-    // 遍历子节点，找出ul和ol元素
-    Array.from(element.children).forEach(child => {
-      if (child.tagName && (child.tagName.toLowerCase() === 'ul' || child.tagName.toLowerCase() === 'ol')) {
-        lists.push(child);
+    // 使用深度优先搜索查找所有列表
+    // 步骤1: 找出所有列表元素（不管嵌套多深）
+    const findAllLists = (el: Element): Element[] => {
+      let result: Element[] = [];
+      
+      // 检查当前元素是否是列表
+      if (el.tagName && (el.tagName.toLowerCase() === 'ul' || el.tagName.toLowerCase() === 'ol')) {
+        result.push(el);
       }
-    });
+      
+      // 遍历直接子元素
+      Array.from(el.children).forEach(child => {
+        // 不要递归到列表项内部查找列表，这些会在后续递归中处理
+        if (child.tagName && child.tagName.toLowerCase() !== 'li') {
+          result = result.concat(findAllLists(child));
+        }
+      });
+      
+      return result;
+    };
+    
+    // 获取当前元素下的所有列表（不包括列表项内的列表）
+    const lists = findAllLists(element);
     
     lists.forEach((list: Element) => {
       const isOrdered = list.tagName.toLowerCase() === 'ol';
