@@ -61,6 +61,7 @@ const Preview: React.FC<PreviewProps> = ({ content }) => {
           margin: styles.pre.margin,
           borderRadius: styles.pre.borderRadius,
           color: styles.pre.color,
+          backgroundColor: styles.pre.background,
         };
         
         return (
@@ -69,6 +70,11 @@ const Preview: React.FC<PreviewProps> = ({ content }) => {
             language={match[1]}
             PreTag="div"
             customStyle={codeStyle}
+            codeTagProps={{
+              style: {
+                backgroundColor: 'transparent'
+              }
+            }}
             {...props}
           >
             {content}
