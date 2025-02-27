@@ -196,7 +196,59 @@ export function applyThemeStyles(content: string, theme: Theme) {
       .join(';');
   };
   
-  return content
+  // 首先处理表格和表格单元格，确保它们具有较高的优先级
+  let processedContent = content
+    // 处理表格
+    .replace(/<table([^>]*)>/g, (match, attrs) => {
+      // 拼接完整的表格样式
+      const tableStyle = `border-collapse:collapse;width:${theme.table.width};margin:${theme.table.margin};font-size:${theme.table.fontSize};border:${theme.table.border};border-spacing:${theme.table.borderSpacing}`;
+      
+      // 检查是否已有style属性
+      if (attrs && attrs.includes('style=')) {
+        // 已有style属性，将新样式添加到现有样式中
+        return match.replace(/style="([^"]*)"/, (styleMatch, existingStyle) => {
+          return `style="${existingStyle};${tableStyle}"`;
+        });
+      } else {
+        // 没有style属性，添加新的style属性
+        return `<table${attrs} style="${tableStyle}">`;
+      }
+    })
+    // 处理表头单元格
+    .replace(/<th([^>]*)>/g, (match, attrs) => {
+      // 拼接完整的表头单元格样式
+      const thStyle = `border:${theme.table.header.border};padding:${theme.table.cell.padding};background:${theme.table.header.background};font-weight:${theme.table.header.fontWeight}`;
+      
+      // 检查是否已有style属性
+      if (attrs && attrs.includes('style=')) {
+        // 已有style属性，将新样式添加到现有样式中
+        return match.replace(/style="([^"]*)"/, (styleMatch, existingStyle) => {
+          return `style="${existingStyle};${thStyle}"`;
+        });
+      } else {
+        // 没有style属性，添加新的style属性
+        return `<th${attrs} style="${thStyle}">`;
+      }
+    })
+    // 处理普通单元格
+    .replace(/<td([^>]*)>/g, (match, attrs) => {
+      // 拼接完整的普通单元格样式
+      const tdStyle = `border:${theme.table.cell.border};padding:${theme.table.cell.padding}`;
+      
+      // 检查是否已有style属性
+      if (attrs && attrs.includes('style=')) {
+        // 已有style属性，将新样式添加到现有样式中
+        return match.replace(/style="([^"]*)"/, (styleMatch, existingStyle) => {
+          return `style="${existingStyle};${tdStyle}"`;
+        });
+      } else {
+        // 没有style属性，添加新的style属性
+        return `<td${attrs} style="${tdStyle}">`;
+      }
+    });
+
+  // 然后处理其他元素
+  return processedContent
     .replace(/<div[^>]*>/g, `<div style="${styleToString(styles.div)}">`)
     .replace(/<h1[^>]*>(.*?)<\/h1>/g, `<h1 style="${styleToString(styles.h1)}">$1</h1>`)
     .replace(/<h2[^>]*>(.*?)<\/h2>/g, `<h2 style="${styleToString(styles.h2)}">$1</h2>`)
@@ -236,9 +288,6 @@ export function applyThemeStyles(content: string, theme: Theme) {
       };
       return `<code style="${styleToString(style)}">${content}</code>`;
     })
-    .replace(/<table[^>]*>/g, `<table style="${styleToString(styles.table)}">`)
-    .replace(/<th[^>]*>(.*?)<\/th>/g, `<th style="${styleToString(styles.th)}">$1</th>`)
-    .replace(/<td[^>]*>(.*?)<\/td>/g, `<td style="${styleToString(styles.td)}">$1</td>`)
     .replace(/<blockquote[^>]*>(.*?)<\/blockquote>/g, `<blockquote style="${styleToString(styles.blockquote)}">$1</blockquote>`)
     .replace(/<ul[^>]*>/g, `<ul style="${styleToString(styles.ul)}">`)
     .replace(/<ol[^>]*>/g, `<ol style="${styleToString(styles.ol)}">`)
