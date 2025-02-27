@@ -247,6 +247,76 @@ export function applyThemeStyles(content: string, theme: Theme) {
       }
     });
 
+  // 处理列表元素转换为div
+  // 创建一个映射，用于跟踪有序列表的计数
+  const olCounters: Record<string, number> = {};
+  const listNestingLevel: string[] = [];
+  let currentOlId = 0;
+
+  // 处理无序列表 - 转换为div
+  processedContent = processedContent.replace(/<ul([^>]*)>/g, (match, attrs) => {
+    // 生成新的无序列表容器div，样式与原ul一致
+    const ulStyle = styleToString(styles.ul);
+    // 添加嵌套级别跟踪
+    listNestingLevel.push('ul');
+    return `<div class="wx-ul" style="${ulStyle};padding-left:2em;margin-left:0">`;
+  });
+
+  // 处理有序列表 - 转换为div
+  processedContent = processedContent.replace(/<ol([^>]*)>/g, (match, attrs) => {
+    // 每个ol获取唯一ID，用于跟踪计数
+    const olId = `ol-${currentOlId++}`;
+    olCounters[olId] = 1;
+    // 添加嵌套级别跟踪
+    listNestingLevel.push(olId);
+    // 生成新的有序列表容器div，样式与原ol一致
+    const olStyle = styleToString(styles.ol);
+    return `<div class="wx-ol" style="${olStyle};padding-left:2em;margin-left:0">`;
+  });
+
+  // 处理列表项 - 转换为带有项目符号或序号的div
+  processedContent = processedContent.replace(/<li([^>]*)>([\s\S]*?)<\/li>/g, (match, attrs, content) => {
+    // 确定当前列表项属于哪种列表类型
+    const currentListType = listNestingLevel[listNestingLevel.length - 1] || 'ul';
+    let prefix = '';
+    let indent = listNestingLevel.length > 1 ? (listNestingLevel.length - 1) * 1.5 : 0;
+    
+    if (currentListType === 'ul') {
+      // 无序列表项，使用圆点作为前缀
+      prefix = '• ';
+    } else {
+      // 有序列表项，使用序号作为前缀
+      const olId = currentListType;
+      prefix = `${olCounters[olId]}. `;
+      olCounters[olId]++;
+    }
+    
+    // 生成新的列表项div，样式与原li一致，添加前缀
+    const liStyle = styleToString({
+      ...styles.li,
+      position: 'relative',
+      display: 'block',
+      marginLeft: `${indent}em`,
+    });
+    
+    return `<div class="wx-li" style="${liStyle}"><span style="position:absolute;left:-1.5em;font-weight:${currentListType === 'ul' ? 'bold' : 'normal'}">${prefix}</span>${content}</div>`;
+  });
+
+  // 结束列表时，弹出嵌套级别跟踪
+  processedContent = processedContent.replace(/<\/ul>/g, () => {
+    if (listNestingLevel.length > 0) {
+      listNestingLevel.pop();
+    }
+    return '</div>';
+  });
+
+  processedContent = processedContent.replace(/<\/ol>/g, () => {
+    if (listNestingLevel.length > 0) {
+      listNestingLevel.pop();
+    }
+    return '</div>';
+  });
+
   // 然后处理其他元素
   return processedContent
     .replace(/<div[^>]*>/g, `<div style="${styleToString(styles.div)}">`)
@@ -289,9 +359,6 @@ export function applyThemeStyles(content: string, theme: Theme) {
       return `<code style="${styleToString(style)}">${content}</code>`;
     })
     .replace(/<blockquote[^>]*>(.*?)<\/blockquote>/g, `<blockquote style="${styleToString(styles.blockquote)}">$1</blockquote>`)
-    .replace(/<ul[^>]*>/g, `<ul style="${styleToString(styles.ul)}">`)
-    .replace(/<ol[^>]*>/g, `<ol style="${styleToString(styles.ol)}">`)
-    .replace(/<li[^>]*>(.*?)<\/li>/g, `<li style="${styleToString(styles.li)}">$1</li>`)
     .replace(/<a([^>]*)>(.*?)<\/a>/g, `<a$1 style="${styleToString(styles.a)}">$2</a>`)
     .replace(/<hr[^>]*>/g, `<hr style="${styleToString(styles.hr)}" />`)
     .replace(/<strong[^>]*>(.*?)<\/strong>/g, `<strong style="${styleToString(styles.strong)}">$1</strong>`)
