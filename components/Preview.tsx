@@ -29,7 +29,7 @@ const Preview: React.FC<PreviewProps> = ({ content }) => {
     h5: ({ children }: ComponentProps) => <h5 style={styles.h5}>{children}</h5>,
     h6: ({ children }: ComponentProps) => <h6 style={styles.h6}>{children}</h6>,
     p: ({ children }: ComponentProps) => <p style={styles.p}>{children}</p>,
-    img: ({ src, alt, ...props }: ComponentProps) => (
+    img: ({ src, alt }: ComponentProps) => (
       src ? (
         <div style={{ margin: styles.img.margin }}>
           <Image
@@ -46,43 +46,35 @@ const Preview: React.FC<PreviewProps> = ({ content }) => {
       ) : null
     ),
     pre: ({ children }: ComponentProps) => <pre style={styles.pre}>{children}</pre>,
-    code: ({ node, inline, className, children, ...props }: ComponentProps & { inline?: boolean; className?: string }) => {
+    code: ({ inline, className, children }: ComponentProps & { inline?: boolean; className?: string }) => {
       const match = /language-(\w+)/.exec(className || '');
       const content = String(children).replace(/\n$/, '');
       
       if (!inline && match) {
         // 代码块
-        const codeStyle = {
-          fontFamily: styles.code.fontFamily,
-          fontSize: styles.code.fontSize,
-          lineHeight: styles.code.lineHeight,
-          background: styles.pre.background,
-          padding: styles.pre.padding,
-          margin: styles.pre.margin,
-          borderRadius: styles.pre.borderRadius,
-          color: styles.pre.color,
-          backgroundColor: styles.pre.background,
-        };
-        
         return (
           <SyntaxHighlighter
             style={oneLight}
             language={match[1]}
             PreTag="div"
-            customStyle={codeStyle}
-            codeTagProps={{
-              style: {
-                backgroundColor: 'transparent'
-              }
+            customStyle={{
+              fontFamily: styles.code.fontFamily,
+              fontSize: styles.code.fontSize,
+              lineHeight: styles.code.lineHeight,
+              background: styles.pre.background,
+              padding: styles.pre.padding,
+              margin: styles.pre.margin,
+              borderRadius: styles.pre.borderRadius,
+              color: styles.pre.color,
             }}
-            {...props}
+            codeTagProps={{ style: { backgroundColor: 'transparent' } }}
           >
             {content}
           </SyntaxHighlighter>
         );
       } else {
         // 行内代码
-        return <code style={styles.codeInline} {...props}>{children}</code>;
+        return <code style={styles.codeInline}>{children}</code>;
       }
     },
     table: ({ children }: ComponentProps) => <table style={styles.table}>{children}</table>,
@@ -115,7 +107,7 @@ const Preview: React.FC<PreviewProps> = ({ content }) => {
   };
 
   return (
-    <div style={styles.div}>
+    <div className="markdown-body" style={styles.div}>
       <ReactMarkdown 
         remarkPlugins={[remarkGfm]} 
         components={components}

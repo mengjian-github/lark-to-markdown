@@ -11,18 +11,14 @@ const turndownService = new TurndownService({
 turndownService.addRule('strong', {
   filter: ['strong', 'b'],
   replacement: function (content, node, options) {
-    // 检查前后节点是否是 strong 标签
-    const prevIsStrong = node.previousSibling?.nodeName?.toLowerCase() === 'strong' ||
+    const prevIsStrong = node.previousSibling?.nodeName?.toLowerCase() === 'strong' || 
                         node.previousSibling?.nodeName?.toLowerCase() === 'b';
-    const nextIsStrong = node.nextSibling?.nodeName?.toLowerCase() === 'strong' ||
+    const nextIsStrong = node.nextSibling?.nodeName?.toLowerCase() === 'strong' || 
                         node.nextSibling?.nodeName?.toLowerCase() === 'b';
     
-    // 如果前面是 strong，不添加前面的 **
     const prefix = prevIsStrong ? '' : '**';
-    // 如果后面是 strong，不添加后面的 **
     const suffix = nextIsStrong ? '' : '**';
     
-    // 检查是否需要添加空格
     const needSpaceBefore = !prevIsStrong && node.previousSibling && 
       node.previousSibling.nodeType === 3 && 
       !node.previousSibling.nodeValue?.endsWith(' ');
@@ -37,25 +33,21 @@ turndownService.addRule('strong', {
   }
 });
 
-// 获取单元格对齐方式的辅助函数
+// 获取单元格对齐方式
 function getCellAlignment(cell: HTMLElement): string {
   const style = cell.getAttribute('style') || '';
   const className = cell.getAttribute('class') || '';
   
-  // 优先检查 style 属性中的对齐方式
   if (style.includes('text-align: center') || className.includes('align-center')) {
     return ':---:';
   }
   if (style.includes('text-align: right') || className.includes('align-right')) {
     return '---:';
   }
-  if (style.includes('text-align: left') || className.includes('align-left')) {
-    return ':---';
-  }
-  return '---'; // 默认左对齐
+  return ':---'; // 默认左对齐
 }
 
-// 处理图片的辅助函数
+// 处理图片
 function processImage(img: HTMLImageElement): string {
   let src = img.getAttribute('src') || '';
   const alt = img.alt || '';
@@ -67,7 +59,7 @@ function processImage(img: HTMLImageElement): string {
   const height = img.getAttribute('height') || img.style.height || '';
   const style = img.getAttribute('style') || '';
   
-  // 从 style 中提取宽高（如果存在）
+  // 从style中提取宽高
   const widthMatch = style.match(/width:\s*(\d+)px/);
   const heightMatch = style.match(/height:\s*(\d+)px/);
   const styleWidth = widthMatch ? widthMatch[1] : '';
@@ -80,20 +72,19 @@ function processImage(img: HTMLImageElement): string {
     src = tokenSrc;
   }
   
-  // 如果是 base64 图片，直接使用
+  // 如果是base64图片，直接使用
   if (src.startsWith('data:image')) {
     return `![${alt}](${src})`;
   }
   
   // 处理飞书域名的图片
   if (src.includes('feishu.cn') || src.includes('larksuite.com')) {
-    // 确保使用 https
     if (!src.startsWith('http')) {
       src = 'https:' + src;
     }
   }
   
-  // 构建 HTML 格式的图片标签以保持尺寸
+  // 构建HTML格式的图片标签以保持尺寸
   const actualWidth = width || styleWidth;
   const actualHeight = height || styleHeight;
   
@@ -107,7 +98,7 @@ function processImage(img: HTMLImageElement): string {
   return `![${alt}](${src})`;
 }
 
-// 处理单元格内容的辅助函数
+// 处理单元格内容
 function processCellContent(cell: HTMLElement): string {
   // 处理图片
   const img = cell.querySelector('img');
@@ -135,7 +126,7 @@ turndownService.addRule('image', {
   }
 });
 
-// 配置飞书特殊的代码块规则
+// 配置代码块规则
 turndownService.addRule('codeBlock', {
   filter: function(node: HTMLElement): boolean {
     if (node.nodeName !== 'PRE') return false;
@@ -202,9 +193,20 @@ export function processHtmlForWeixin(htmlContent: string): string {
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = htmlContent;
   
-  // 处理所有列表项中的内容
-  tempDiv.querySelectorAll('li').forEach(li => {
-    // 如果列表项中直接包含文本节点，将其包装在span中
+  // 尝试智能识别主要内容区
+  const contentRoot = tempDiv.querySelector('.markdown-body') || 
+                      tempDiv.querySelector('div[style] > div') ||
+                      tempDiv.querySelector('div > div > div') ||
+                      tempDiv;
+  
+  // 移除可能干扰内容的UI元素
+  const uiSelectors = ['.toolbar', '.status-bar-content', '.phone-status-bar', '.phone-home-indicator'];
+  uiSelectors.forEach(selector => {
+    contentRoot.querySelectorAll(selector).forEach(el => el.parentNode?.removeChild(el));
+  });
+  
+  // 处理列表项中的文本节点
+  contentRoot.querySelectorAll('li').forEach(li => {
     Array.from(li.childNodes).forEach(node => {
       if (node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) {
         const span = document.createElement('span');
@@ -215,7 +217,65 @@ export function processHtmlForWeixin(htmlContent: string): string {
     });
   });
   
-  return tempDiv.innerHTML;
+  // 处理图片元素
+  contentRoot.querySelectorAll('img').forEach(img => {
+    img.style.maxWidth = img.style.maxWidth || '100%';
+    img.style.display = img.style.display || 'block';
+    img.style.margin = img.style.margin || '10px auto';
+  });
+  
+  // 处理代码块
+  contentRoot.querySelectorAll('pre').forEach(pre => {
+    if (pre instanceof HTMLElement) {
+      pre.style.backgroundColor = '#f6f8fa';
+      pre.style.borderRadius = '3px';
+      pre.style.padding = '16px';
+      pre.style.overflow = 'auto';
+      pre.style.fontSize = '14px';
+      pre.style.lineHeight = '1.45';
+      pre.style.fontFamily = 'SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace';
+    }
+  });
+  
+  // 处理表格
+  contentRoot.querySelectorAll('table').forEach(table => {
+    if (table instanceof HTMLElement) {
+      table.style.borderCollapse = 'collapse';
+      table.style.width = '100%';
+      table.style.margin = '16px 0';
+      
+      table.querySelectorAll('th, td').forEach(cell => {
+        if (cell instanceof HTMLElement) {
+          cell.style.border = cell.style.border || '1px solid #dfe2e5';
+          cell.style.padding = cell.style.padding || '8px 12px';
+        }
+      });
+      
+      table.querySelectorAll('th').forEach(th => {
+        if (th instanceof HTMLElement) {
+          th.style.backgroundColor = '#f6f8fa';
+          th.style.fontWeight = 'bold';
+        }
+      });
+    }
+  });
+  
+  // 添加内联样式表
+  const style = document.createElement('style');
+  style.textContent = `
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; }
+    p { margin: 10px 0; }
+    img { max-width: 100%; display: block; margin: 10px auto; }
+    code { background-color: rgba(0, 0, 0, 0.05); padding: 0.2em 0.4em; border-radius: 3px; font-family: monospace; }
+    pre { background-color: #f6f8fa; padding: 16px; overflow: auto; border-radius: 3px; margin: 16px 0; }
+    blockquote { padding-left: 1em; border-left: 4px solid #ddd; color: #666; margin: 16px 0; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+    th, td { border: 1px solid #dfe2e5; padding: 8px 12px; }
+    th { background-color: #f6f8fa; }
+  `;
+  
+  // 返回带样式的HTML
+  return style.outerHTML + (contentRoot === tempDiv ? contentRoot.innerHTML : contentRoot.outerHTML);
 }
 
 export default turndownService; 
