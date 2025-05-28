@@ -5,7 +5,7 @@ export const elegantTheme: Theme = {
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
     fontSize: '15px',
     lineHeight: '1.75',
-    color: '#3a2f45',
+    color: '#343434',
     letterSpacing: '0.03em',
     textAlign: 'left',
   },
@@ -15,40 +15,40 @@ export const elegantTheme: Theme = {
     letterSpacing: '0.02em',
     h1: {
       fontSize: '28px',
-      margin: '1.2em 0 0.8em',
+      margin: '1.5em 0 1em',
       textAlign: 'center',
       borderBottom: '2px solid #7b2cbf',
-      paddingBottom: '0.4em',
+      paddingBottom: '0.5em',
       position: 'relative',
     },
     h2: {
       fontSize: '22px',
-      margin: '1.8em 0 0.8em',
+      margin: '2em 0 1em',
       borderLeft: '4px solid #7b2cbf',
       paddingLeft: '12px',
       color: '#7b2cbf',
     },
     h3: {
       fontSize: '18px',
-      margin: '1.5em 0 0.8em',
-      color: '#9d4edd',
+      margin: '1.8em 0 1em',
+      color: '#7b2cbf',
     },
     h4: {
       fontSize: '16px',
-      margin: '1.2em 0 0.6em',
+      margin: '1.5em 0 0.8em',
     },
     h5: {
       fontSize: '15px',
-      margin: '1em 0 0.6em',
+      margin: '1.2em 0 0.8em',
     },
     h6: {
       fontSize: '14px',
-      margin: '1em 0 0.6em',
+      margin: '1.2em 0 0.8em',
       color: '#4a5568',
     },
   },
   paragraph: {
-    margin: '1em 0',
+    margin: '1.2em 0',
     lineHeight: '1.75',
   },
   image: {
@@ -58,12 +58,12 @@ export const elegantTheme: Theme = {
   },
   code: {
     fontFamily: 'Menlo, Monaco, Consolas, "Courier New", monospace',
-    fontSize: '0.9em',
+    fontSize: '14px',
     lineHeight: '1.6',
     block: {
       background: '#f8f7fa',
-      padding: '1em',
-      margin: '1.5em 0',
+      padding: '1.2em',
+      margin: '1.8em 0',
       borderRadius: '4px',
       color: '#3a2f45',
       overflow: 'auto',
@@ -78,13 +78,13 @@ export const elegantTheme: Theme = {
   },
   table: {
     width: '100%',
-    margin: '1em 0',
-    fontSize: '14px',
+    margin: '1.5em 0',
+    fontSize: '15px',
     borderCollapse: 'collapse',
     borderSpacing: '0',
     border: '1px solid #e7dcf5',
     cell: {
-      padding: '8px 16px',
+      padding: '10px 16px',
       border: '1px solid #e7dcf5',
     },
     header: {
@@ -94,8 +94,8 @@ export const elegantTheme: Theme = {
     },
   },
   blockquote: {
-    margin: '1.5em 0',
-    padding: '0.8em 1.2em',
+    margin: '1.8em 0',
+    padding: '1em 1.5em',
     borderLeft: '4px solid #7b2cbf',
     fontStyle: 'normal',
     color: '#4a5568',
@@ -103,7 +103,7 @@ export const elegantTheme: Theme = {
     borderRadius: '0 4px 4px 0',
   },
   list: {
-    margin: '1em 0',
+    margin: '1.2em 0',
     padding: '0 0 0 2em',
     item: {
       margin: '0.5em 0',
@@ -134,7 +134,7 @@ export const elegantTheme: Theme = {
     borderBottom: '1px dotted #c8b6e2',
   },
   hr: {
-    margin: '1.5em 0',
+    margin: '2em 0',
     border: '1px solid #e7dcf5',
   },
   emphasis: {
@@ -143,7 +143,7 @@ export const elegantTheme: Theme = {
       fontWeight: 'bold',
     },
     em: {
-      color: '#6247aa',
+      color: '#7b2cbf',
       fontStyle: 'italic',
     },
   },

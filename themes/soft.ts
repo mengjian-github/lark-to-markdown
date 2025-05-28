@@ -5,7 +5,7 @@ export const softTheme: Theme = {
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
     fontSize: '15px',
     lineHeight: '1.75',
-    color: '#454545',
+    color: '#343434',
     letterSpacing: '0.03em',
     textAlign: 'left',
   },
@@ -15,40 +15,40 @@ export const softTheme: Theme = {
     letterSpacing: '0.02em',
     h1: {
       fontSize: '28px',
-      margin: '1.2em 0 0.8em',
+      margin: '1.5em 0 1em',
       textAlign: 'center',
       borderBottom: '2px solid #e66d85',
-      paddingBottom: '0.4em',
+      paddingBottom: '0.5em',
       position: 'relative',
     },
     h2: {
       fontSize: '22px',
-      margin: '1.8em 0 0.8em',
+      margin: '2em 0 1em',
       borderLeft: '4px solid #e66d85',
       paddingLeft: '12px',
       color: '#e66d85',
     },
     h3: {
       fontSize: '18px',
-      margin: '1.5em 0 0.8em',
-      color: '#e87c91',
+      margin: '1.8em 0 1em',
+      color: '#e66d85',
     },
     h4: {
       fontSize: '16px',
-      margin: '1.2em 0 0.6em',
+      margin: '1.5em 0 0.8em',
     },
     h5: {
       fontSize: '15px',
-      margin: '1em 0 0.6em',
+      margin: '1.2em 0 0.8em',
     },
     h6: {
       fontSize: '14px',
-      margin: '1em 0 0.6em',
+      margin: '1.2em 0 0.8em',
       color: '#4a5568',
     },
   },
   paragraph: {
-    margin: '1em 0',
+    margin: '1.2em 0',
     lineHeight: '1.75',
   },
   image: {
@@ -58,12 +58,12 @@ export const softTheme: Theme = {
   },
   code: {
     fontFamily: 'Menlo, Monaco, Consolas, "Courier New", monospace',
-    fontSize: '0.9em',
+    fontSize: '14px',
     lineHeight: '1.6',
     block: {
       background: '#fef8fa',
-      padding: '1em',
-      margin: '1.5em 0',
+      padding: '1.2em',
+      margin: '1.8em 0',
       borderRadius: '4px',
       color: '#4a3a42',
       overflow: 'auto',
@@ -72,19 +72,19 @@ export const softTheme: Theme = {
       background: '#fef0f3',
       padding: '0.2em 0.4em',
       borderRadius: '3px',
-      color: '#e84a70',
+      color: '#e66d85',
       fontFamily: 'Menlo, Monaco, Consolas, "Courier New", monospace',
     },
   },
   table: {
     width: '100%',
-    margin: '1em 0',
-    fontSize: '14px',
+    margin: '1.5em 0',
+    fontSize: '15px',
     borderCollapse: 'collapse',
     borderSpacing: '0',
     border: '1px solid #f7dde3',
     cell: {
-      padding: '8px 16px',
+      padding: '10px 16px',
       border: '1px solid #f7dde3',
     },
     header: {
@@ -94,8 +94,8 @@ export const softTheme: Theme = {
     },
   },
   blockquote: {
-    margin: '1.5em 0',
-    padding: '0.8em 1.2em',
+    margin: '1.8em 0',
+    padding: '1em 1.5em',
     borderLeft: '4px solid #e66d85',
     fontStyle: 'normal',
     color: '#4a5568',
@@ -103,7 +103,7 @@ export const softTheme: Theme = {
     borderRadius: '0 4px 4px 0',
   },
   list: {
-    margin: '1em 0',
+    margin: '1.2em 0',
     padding: '0 0 0 2em',
     item: {
       margin: '0.5em 0',
@@ -134,7 +134,7 @@ export const softTheme: Theme = {
     borderBottom: '1px dotted #f5c3ce',
   },
   hr: {
-    margin: '1.5em 0',
+    margin: '2em 0',
     border: '1px solid #f7dde3',
   },
   emphasis: {
@@ -143,7 +143,7 @@ export const softTheme: Theme = {
       fontWeight: 'bold',
     },
     em: {
-      color: '#f4978e',
+      color: '#e66d85',
       fontStyle: 'italic',
     },
   },
