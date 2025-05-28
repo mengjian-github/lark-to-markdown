@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react';
-import { FiCopy, FiCheck, FiSmartphone, FiMonitor, FiAlertCircle } from 'react-icons/fi';
+import { FiCopy, FiCheck, FiSmartphone, FiMonitor, FiAlertCircle, FiMessageCircle } from 'react-icons/fi';
 import Preview from './Preview';
 import { ThemeName } from '../contexts/ThemeContext';
 import ThemeSwitcher from './ThemeSwitcher';
+import ContactModal from './ContactModal';
 
 interface PreviewPanelProps {
   markdown: string;
@@ -30,6 +31,8 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
   const mobilePreviewRef = useRef<HTMLDivElement>(null);
   const [showViewTooltip, setShowViewTooltip] = useState(false);
   const [showCopyTooltip, setShowCopyTooltip] = useState(false);
+  const [showContactTooltip, setShowContactTooltip] = useState(false);
+  const [contactVisible, setContactVisible] = useState(false);
 
   return (
     <div className={`w-1/2 p-4 ${isMobilePreview ? '' : 'overflow-auto'} bg-gray-50 relative`}>
@@ -61,47 +64,68 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
           )}
         </div>
         
-        <div className="relative">
-          <button
-            onClick={handleCopyToWeixin}
-            onMouseEnter={() => setShowCopyTooltip(true)}
-            onMouseLeave={() => setShowCopyTooltip(false)}
-            disabled={isCopying}
-            className={`copy-btn flex items-center space-x-1 px-3 py-1.5 ${
-              isCopying ? 'bg-blue-400 btn-loading' : 
-              copyError ? 'bg-red-500 hover:bg-red-600' : 
-              'bg-blue-500 hover:bg-blue-600'
-            } text-white rounded-md transition-colors`}
-          >
-            {!isCopying && copyError ? (
-              <>
-                <FiAlertCircle className="w-4 h-4" />
-                <span className="text-sm">复制失败</span>
-              </>
-            ) : !isCopying && copied ? (
-              <>
-                <FiCheck className="w-4 h-4" />
-                <span className="text-sm">已复制</span>
-              </>
-            ) : !isCopying ? (
-              <>
-                <FiCopy className="w-4 h-4" />
-                <span className="text-sm">复制到公众号</span>
-              </>
-            ) : (
-              <span className="text-sm opacity-0">复制中...</span>
+        <div className="flex items-center space-x-2">
+          {/* 联系作者按钮 */}
+          <div className="relative">
+            <button
+              onClick={() => setContactVisible(true)}
+              onMouseEnter={() => setShowContactTooltip(true)}
+              onMouseLeave={() => setShowContactTooltip(false)}
+              className="flex items-center space-x-1 px-3 py-1.5 bg-green-100 hover:bg-green-200 text-green-700 rounded-md transition-colors"
+            >
+              <FiMessageCircle className="w-4 h-4" />
+              <span className="text-sm">联系作者</span>
+            </button>
+            {showContactTooltip && (
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap z-50">
+                联系作者反馈问题或建议
+              </div>
             )}
-          </button>
-          {showCopyTooltip && !copied && !copyError && !isCopying && (
-            <div className="absolute top-full right-0 mt-1 px-2 py-1 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap z-50">
-              复制到公众号
-            </div>
-          )}
-          {copyError && !isCopying && (
-            <div className="absolute top-full right-0 mt-1 px-2 py-1 bg-red-600 text-white text-xs rounded shadow-lg whitespace-nowrap z-50 max-w-xs">
-              {copyError}
-            </div>
-          )}
+          </div>
+
+          {/* 复制按钮 */}
+          <div className="relative">
+            <button
+              onClick={handleCopyToWeixin}
+              onMouseEnter={() => setShowCopyTooltip(true)}
+              onMouseLeave={() => setShowCopyTooltip(false)}
+              disabled={isCopying}
+              className={`copy-btn flex items-center space-x-1 px-3 py-1.5 ${
+                isCopying ? 'bg-blue-400 btn-loading' : 
+                copyError ? 'bg-red-500 hover:bg-red-600' : 
+                'bg-blue-500 hover:bg-blue-600'
+              } text-white rounded-md transition-colors`}
+            >
+              {!isCopying && copyError ? (
+                <>
+                  <FiAlertCircle className="w-4 h-4" />
+                  <span className="text-sm">复制失败</span>
+                </>
+              ) : !isCopying && copied ? (
+                <>
+                  <FiCheck className="w-4 h-4" />
+                  <span className="text-sm">已复制</span>
+                </>
+              ) : !isCopying ? (
+                <>
+                  <FiCopy className="w-4 h-4" />
+                  <span className="text-sm">复制到公众号</span>
+                </>
+              ) : (
+                <span className="text-sm opacity-0">复制中...</span>
+              )}
+            </button>
+            {showCopyTooltip && !copied && !copyError && !isCopying && (
+              <div className="absolute top-full right-0 mt-1 px-2 py-1 bg-gray-800 text-white text-xs rounded shadow-lg whitespace-nowrap z-50">
+                复制到公众号
+              </div>
+            )}
+            {copyError && !isCopying && (
+              <div className="absolute top-full right-0 mt-1 px-2 py-1 bg-red-600 text-white text-xs rounded shadow-lg whitespace-nowrap z-50 max-w-xs">
+                {copyError}
+              </div>
+            )}
+          </div>
         </div>
       </div>
       
@@ -141,6 +165,12 @@ const PreviewPanel: React.FC<PreviewPanelProps> = ({
           </div>
         )}
       </div>
+
+      {/* 联系作者模态框 */}
+      <ContactModal
+        visible={contactVisible}
+        onCancel={() => setContactVisible(false)}
+      />
 
       <style jsx>{`
         .mobile-preview {
