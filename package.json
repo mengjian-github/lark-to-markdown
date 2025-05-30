@@ -1,12 +1,35 @@
 {
   "name": "lark-to-markdown",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "description": "飞书文档转公众号排版工具 - 一键将飞书文档转换为美观的微信公众号文章",
+  "author": "孟健 <mengjian.github@outlook.com>",
+  "license": "MIT",
+  "keywords": [
+    "lark",
+    "feishu",
+    "wechat",
+    "weixin",
+    "markdown",
+    "converter",
+    "公众号",
+    "飞书",
+    "微信"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mengjian-github/lark-to-markdown.git"
+  },
+  "homepage": "https://lark-to-markdown.vercel.app",
+  "bugs": {
+    "url": "https://github.com/mengjian-github/lark-to-markdown/issues"
+  },
+  "private": false,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "export": "next build && next export"
   },
   "dependencies": {
     "@types/next": "^9.0.0",
