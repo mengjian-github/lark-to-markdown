@@ -292,11 +292,11 @@ export const defaultTheme: Theme = {
   },
   emphasis: {
     strong: {
-      color: '#222222',
+      color: '#1a73e8',
       fontWeight: '600',
     },
     em: {
-      color: '#595959',
+      color: '#1a73e8',
       fontStyle: 'italic',
     },
   },

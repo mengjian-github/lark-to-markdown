@@ -146,7 +146,7 @@ export const warmTheme: Theme = {
       fontWeight: '600',
     },
     em: {
-      color: '#666666',
+      color: '#e67e22',
       fontStyle: 'italic',
     },
   },

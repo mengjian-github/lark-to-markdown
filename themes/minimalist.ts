@@ -143,7 +143,7 @@ export const minimalistTheme: Theme = {
       fontWeight: 'bold',
     },
     em: {
-      color: '#7f8c8d',
+      color: '#34495e',
       fontStyle: 'italic',
     },
   },
